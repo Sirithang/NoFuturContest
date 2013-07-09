@@ -1,4 +1,5 @@
 #include "../assets/player.h"
+#include "../assets/zorro_spriteset.h"
 #include "../assets/obstacle.h"
 
 #include "GameHub.hpp"
@@ -8,7 +9,7 @@ GameHub GameHub::hub;
 
 #define PLAYER_SPRITE 0
 #define PLAYER_TILE 0
-#define PLAYER_TILE_COUNT (4*8)
+#define PLAYER_TILE_COUNT (8*8)
 #define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
 
 #define OBSTACLE_SPRITE (PLAYER_SPRITE + 1)
@@ -32,7 +33,9 @@ void GameHub::init()
 	oamInit(&oamSub, SpriteMapping_1D_32, false);
 
 	// load player's first frame
-	dmaCopy(playerTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+	player_frame = 0;
+	dmaCopy(zorro_spritesetTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+	dmaCopy(zorro_spritesetPal, SPRITE_PALETTE_SUB, sizeof(zorro_spritesetPal));
 
 	// init the gameplay variables
 	player_life = 100;
@@ -95,7 +98,7 @@ void GameHub::update_top()
 
 	// player
 	oamSet(	&oamSub, PLAYER_SPRITE, /*x*/0, /*y*/0, /*priority*/0, /*palette*/0,
-		SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, PLAYER_TILE),
+		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, PLAYER_TILE),
 		0, false, false, false, false, false);
 
 	// obstacle
@@ -107,10 +110,10 @@ void GameHub::update_top()
 void GameHub::draw_top()
 {
 	// animate tiles
-	if ((frame_counter & 0xf) == 0)
+	if ((frame_counter & 0x7) == 0)
 	{
-		unsigned char frame = (frame_counter >> 4) & 0x3;
-		dmaCopy(playerTiles + PLAYER_TILE_SIZE*frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+		player_frame = player_frame < 5 ? player_frame + 1 : 0;
+		dmaCopy(zorro_spritesetTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
 	}
 
 	// update the OAM

@@ -6,6 +6,7 @@
 class GameHub : public Game
 {
 	public:
+		unsigned char player_frame;
 		unsigned short player_life;
 
 		short obstacle_position;
