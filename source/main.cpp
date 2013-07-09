@@ -7,6 +7,8 @@ int main()
 {
 	videoSetMode(MODE_0_2D);
 	videoSetModeSub(MODE_0_2D);
+
+	lcdMainOnBottom();
 	
 	// Enable interrupts.
 	irqInit();
