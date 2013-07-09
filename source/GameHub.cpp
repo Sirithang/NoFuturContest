@@ -1,3 +1,6 @@
+#include "../assets/player.h"
+#include "../assets/obstacle.h"
+
 #include "GameHub.hpp"
 #include <nds.h>
 
@@ -5,19 +8,17 @@ GameHub GameHub::hub;
 
 #define PLAYER_SPRITE 0
 #define PLAYER_TILE 0
-#define PLAYER_TILE_SIZE (4*8*32)
+#define PLAYER_TILE_COUNT (4*8)
+#define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
 
 #define OBSTACLE_SPRITE (PLAYER_SPRITE + 1)
-#define OBSTACLE_TILE (PLAYER_TILE + PLAYER_TILE_SIZE)
-#define OBSTACLE_TILE_SIZE (4*4*32)
+#define OBSTACLE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
+#define OBSTACLE_TILE_COUNT (4*4)
+#define OBSTACLE_TILE_SIZE (OBSTACLE_TILE_COUNT*32)
 
 void GameHub::init()
 {
 	frame_counter = 0;
-
-	// init the gameplay variables
-	player_life = 100;
-	new_obstacle();
 
 	// init the sub screen
 	vramSetBankC(VRAM_C_SUB_BG);
@@ -31,7 +32,12 @@ void GameHub::init()
 	oamInit(&oamSub, SpriteMapping_1D_32, false);
 
 	// load player's first frame
-	//dmaCopy(player_rom_animset, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+	dmaCopy(playerTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+
+	// init the gameplay variables
+	player_life = 100;
+	obstacle_type = 1;
+	new_obstacle();
 
 	// init the main screen
 	resume();
@@ -64,8 +70,7 @@ void GameHub::update()
 
 	// check if it is time to click minigame
 	// and the correct game is clicked
-	Game::start_game(obstacle_type);
-
+	//Game::start_game(obstacle_type);
 }
 
 void GameHub::draw()
@@ -78,7 +83,7 @@ void GameHub::draw()
 
 void GameHub::update_top()
 {
-	if (obstacle_position > -100)
+	if (obstacle_position > -50)
 	{
 		--obstacle_position;
 	}
@@ -102,10 +107,10 @@ void GameHub::update_top()
 void GameHub::draw_top()
 {
 	// animate tiles
-	if ((frame_counter & 0x3) == 0)
+	if ((frame_counter & 0xf) == 0)
 	{
-		//unsigned char frame = (frame_counter >> 2) & 0x3;
-		//dmaCopy(player_rom_animset + PLAYER_TILE_SIZE*frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+		unsigned char frame = (frame_counter >> 4) & 0x3;
+		dmaCopy(playerTiles + PLAYER_TILE_SIZE*frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
 	}
 
 	// update the OAM
@@ -116,10 +121,10 @@ void GameHub::draw_top()
 
 void GameHub::new_obstacle()
 {
-	obstacle_type = 0; // todo : RNG
-	obstacle_position = 300;
+	obstacle_type = obstacle_type == 1 ? 0 : 1; // todo : RNG
+	obstacle_position = 270;
 	game_succeed = false;
 
 	// get the obstacle sprite
-	//dmaCopy(obstacle_rom_spriteset + OBSTACLE_TILE_SIZE*obstacle_type, oamGetGfxPtr(&oamSub, OBSTACLE_TILE), OBSTACLE_TILE_SIZE);
+	dmaCopy(obstacleTiles + OBSTACLE_TILE_SIZE*obstacle_type, oamGetGfxPtr(&oamSub, OBSTACLE_TILE), OBSTACLE_TILE_SIZE);
 }

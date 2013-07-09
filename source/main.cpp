@@ -5,10 +5,16 @@
 
 int main()
 {
-	powerOn(POWER_ALL_2D);
+	videoSetMode(MODE_0_2D);
+	videoSetModeSub(MODE_0_2D);
+	
 	// Enable interrupts.
 	irqInit();
 	irqEnable(IRQ_VBLANK);
+	
+	SPRITE_PALETTE[1] = RGB15(31,31,31);
+	SPRITE_PALETTE_SUB[1] = RGB15(31,31,31);
+	//SPRITE_PALETTE[1] = RGB15(0,0,0);
 
 	// initialize the hub, set it at the current screen
 	GameHub::hub.GameHub::init();
@@ -17,7 +23,7 @@ int main()
 
 	while (true)
 	{
-		bool update_top = !Game::is_game_playing() || (frame_number & 0x3) == 0;
+		bool update_top = !Game::is_game_playing() || (frame_number & 0xf) == 0;
 
 		if (update_top)
 		{

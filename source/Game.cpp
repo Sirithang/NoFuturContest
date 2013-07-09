@@ -21,5 +21,5 @@ void Game::game_end(bool success)
 
 bool Game::is_game_playing()
 {
-	return current == &GameHub::hub;
+	return current != &GameHub::hub;
 }
