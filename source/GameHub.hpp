@@ -5,10 +5,6 @@
 
 class GameHub : public Game
 {
-	private:
-		GameHub() {}
-		~GameHub() {}
-
 	public:
 		unsigned short player_life;
 
@@ -25,6 +21,13 @@ class GameHub : public Game
 		void draw_top();
 		
 		static GameHub hub;
+
+	private:
+		GameHub() {}
+		~GameHub() {}
+
+		unsigned char frame_counter;
+		void new_obstacle();
 };
 
 #endif

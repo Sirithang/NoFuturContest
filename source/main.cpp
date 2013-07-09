@@ -17,7 +17,7 @@ int main()
 
 	while (true)
 	{
-		bool update_top = !Game::is_game_playing() || (frame_number >> 2) == 0;
+		bool update_top = !Game::is_game_playing() || (frame_number & 0x3) == 0;
 
 		if (update_top)
 		{
