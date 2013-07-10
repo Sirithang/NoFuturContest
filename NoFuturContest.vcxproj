@@ -53,30 +53,13 @@
     <None Include="MakeFile" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\animation.cpp" />
-    <ClCompile Include="source\background_images.cpp" />
-    <ClCompile Include="source\background_maps.cpp" />
-    <ClCompile Include="source\collision.cpp" />
-    <ClCompile Include="source\game_state.cpp" />
-    <ClCompile Include="source\game_utils.cpp" />
+    <ClCompile Include="source\Game.cpp" />
+    <ClCompile Include="source\GameHub.cpp" />
     <ClCompile Include="source\main.cpp" />
-    <ClCompile Include="source\object_utils.cpp" />
-    <ClCompile Include="source\sprites.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\background_images.h" />
-    <ClInclude Include="include\background_maps.h" />
-    <ClInclude Include="include\palettes.h" />
-    <ClInclude Include="include\sprites.h" />
-    <ClInclude Include="source\animation.h" />
-    <ClInclude Include="source\background_images.h" />
-    <ClInclude Include="source\background_maps.h" />
-    <ClInclude Include="source\collision.h" />
-    <ClInclude Include="source\game_state.h" />
-    <ClInclude Include="source\game_utils.h" />
-    <ClInclude Include="source\object_utils.h" />
-    <ClInclude Include="source\palettes.h" />
-    <ClInclude Include="source\sprites.h" />
+    <ClInclude Include="source\Game.hpp" />
+    <ClInclude Include="source\GameHub.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,72 +12,21 @@
     <None Include="MakeFile" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\background_images.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\background_maps.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\sprites.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\animation.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\collision.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\game_state.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
-    <ClCompile Include="source\game_utils.cpp">
-      <Filter>source</Filter>
-    </ClCompile>
     <ClCompile Include="source\main.cpp">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="source\object_utils.cpp">
+    <ClCompile Include="source\Game.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameHub.cpp">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\background_images.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\background_maps.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\palettes.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\sprites.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="source\animation.h">
+    <ClInclude Include="source\Game.hpp">
       <Filter>source</Filter>
     </ClInclude>
-    <ClInclude Include="source\background_images.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\background_maps.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\collision.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\game_state.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\game_utils.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\object_utils.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\palettes.h">
-      <Filter>source</Filter>
-    </ClInclude>
-    <ClInclude Include="source\sprites.h">
+    <ClInclude Include="source\GameHub.hpp">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
