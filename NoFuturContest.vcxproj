@@ -56,10 +56,12 @@
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\GameHub.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\Object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Game.hpp" />
     <ClInclude Include="source\GameHub.hpp" />
+    <ClInclude Include="source\Objet.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

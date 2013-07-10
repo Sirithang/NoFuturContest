@@ -3,6 +3,8 @@
 #include "../assets/obstacle.h"
 
 #include "GameHub.hpp"
+#include "Objet.hpp"
+
 #include <nds.h>
 
 GameHub GameHub::hub;
@@ -16,6 +18,8 @@ GameHub GameHub::hub;
 #define OBSTACLE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
 #define OBSTACLE_TILE_COUNT (4*4)
 #define OBSTACLE_TILE_SIZE (OBSTACLE_TILE_COUNT*32)
+
+Object playerObj;
 
 void GameHub::init()
 {
@@ -31,6 +35,11 @@ void GameHub::init()
 	oamClear(&oamSub, 0, 0);
 	oamEnable(&oamSub);
 	oamInit(&oamSub, SpriteMapping_1D_32, false);
+
+	object::setPos(playerObj, 40, 40);
+	playerObj.sprite = PLAYER_SPRITE;
+	playerObj.tile = PLAYER_TILE;
+	playerObj.palette = 0;
 
 	// load player's first frame
 	player_frame = 0;
@@ -97,8 +106,8 @@ void GameHub::update_top()
 	}
 
 	// player
-	oamSet(	&oamSub, PLAYER_SPRITE, /*x*/0, /*y*/0, /*priority*/0, /*palette*/0,
-		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, PLAYER_TILE),
+	oamSet(	&oamSub, playerObj.sprite, /*x*/playerObj.x, /*y*/playerObj.y, /*priority*/0, /*palette*/playerObj.palette,
+		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, playerObj.tile),
 		0, false, false, false, false, false);
 
 	// obstacle
