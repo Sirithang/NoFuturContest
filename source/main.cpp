@@ -9,10 +9,15 @@ int main()
 	videoSetModeSub(MODE_0_2D);
 
 	lcdMainOnBottom();
+
+	vramSetBankA(VRAM_A_MAIN_BG);
+	vramSetBankB(VRAM_B_MAIN_SPRITE);
+	vramSetBankC(VRAM_C_SUB_BG);
+	vramSetBankD(VRAM_D_SUB_SPRITE);
 	
 	// Enable interrupts.
-	irqInit();
-	irqEnable(IRQ_VBLANK);
+	//irqInit();
+	//irqEnable(IRQ_VBLANK);
 	
 	SPRITE_PALETTE[1] = RGB15(31,31,31);
 	SPRITE_PALETTE_SUB[1] = RGB15(31,31,31);
@@ -25,7 +30,9 @@ int main()
 
 	while (true)
 	{
-		bool update_top = !Game::is_game_playing() || (frame_number & 0xf) == 0;
+		scanKeys();
+	
+		bool update_top = !Game::is_game_playing() || (frame_number & 0x3) == 0;
 
 		if (update_top)
 		{

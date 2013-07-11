@@ -26,9 +26,9 @@ void GameHub::init()
 {
 	frame_counter = 0;
 
+	// *******************
 	// init the sub screen
-	vramSetBankC(VRAM_C_SUB_BG);
-	vramSetBankD(VRAM_D_SUB_SPRITE);
+	// *******************
 
 	// setup background
 
@@ -52,7 +52,9 @@ void GameHub::init()
 	obstacle_type = 1;
 	new_obstacle();
 
+	// ********************
 	// init the main screen
+	// ********************
 	resume();
 
 	// set as current
@@ -61,10 +63,6 @@ void GameHub::init()
 
 void GameHub::resume()
 {
-	// setup the graphic engine,
-	vramSetBankA(VRAM_A_MAIN_BG);
-	vramSetBankB(VRAM_B_MAIN_SPRITE);
-
 	// restore background(s)
 	int bg = bgInit(0, BgType_Text8bpp, BgSize_T_512x256, 0,1);
 	dmaCopy(test_usine_tilesetsTiles, bgGetGfxPtr(bg), sizeof(test_usine_tilesetsTiles));
@@ -100,7 +98,17 @@ void GameHub::update()
 
 	// check if it is time to click minigame
 	// and the correct game is clicked
-	//Game::start_game(obstacle_type);
+
+	if (keysDown() & KEY_TOUCH)
+	{
+		touchPosition position;
+		touchRead(&position);
+
+		// todo : check position.px and position.py 
+		{
+			Game::start_game(0);
+		}
+	}
 }
 
 void GameHub::draw()
