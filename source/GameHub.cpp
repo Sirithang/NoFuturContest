@@ -70,13 +70,19 @@ void GameHub::resume()
 	dmaCopy(test_usine_tilesetsTiles, bgGetGfxPtr(bg), sizeof(test_usine_tilesetsTiles));
 	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, sizeof(test_usine_tilesetsPal));
 
-	u16* mapPtr = (u16*)bgGetMapPtr(bg);
+	u16* mapPtr = bgGetMapPtr(bg);
 
+	/*
 	unsigned short map[2048];
 	for(int i = 0; i < 2048; ++i)
 		map[i] = 30;
 
 	dmaCopy(map, mapPtr, sizeof(map));//don't work need to check why
+	*/
+	for(int i = 0; i < 2048; ++i)
+	{
+		mapPtr[i] = 30;
+	}
 
 	// reinit oam
 	oamClear(&oamMain, 0, 0);
