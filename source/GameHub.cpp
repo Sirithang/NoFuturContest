@@ -1,6 +1,7 @@
 #include "../assets/player.h"
 #include "../assets/zorro_spriteset.h"
 #include "../assets/obstacle.h"
+#include "../assets/test_usine_tilesets.h"
 
 #include "GameHub.hpp"
 #include "Objet.hpp"
@@ -65,6 +66,17 @@ void GameHub::resume()
 	vramSetBankB(VRAM_B_MAIN_SPRITE);
 
 	// restore background(s)
+	int bg = bgInit(0, BgType_Text8bpp, BgSize_T_512x256, 0,1);
+	dmaCopy(test_usine_tilesetsTiles, bgGetGfxPtr(bg), sizeof(test_usine_tilesetsTiles));
+	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, sizeof(test_usine_tilesetsPal));
+
+	u16* mapPtr = (u16*)bgGetMapPtr(bg);
+
+	unsigned short map[2048];
+	for(int i = 0; i < 2048; ++i)
+		map[i] = 30;
+
+	dmaCopy(map, mapPtr, sizeof(map));//don't work need to check why
 
 	// reinit oam
 	oamClear(&oamMain, 0, 0);
