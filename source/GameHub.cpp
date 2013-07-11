@@ -7,6 +7,8 @@
 #include "Objet.hpp"
 
 #include <nds.h>
+#include <stdlib.h>
+#include <time.h>
 
 GameHub GameHub::hub;
 
@@ -21,6 +23,12 @@ GameHub GameHub::hub;
 #define OBSTACLE_TILE_SIZE (OBSTACLE_TILE_COUNT*32)
 
 Object playerObj;
+
+struct Usine
+{
+	int bg;
+	u16 map[12*16];
+} gUsine;
 
 void GameHub::init()
 {
@@ -55,6 +63,22 @@ void GameHub::init()
 	// ********************
 	// init the main screen
 	// ********************
+
+	for(int i = 0; i < 12*16; ++i)
+		gUsine.map[i] = 0;
+
+	srand(time(NULL));
+
+	//create the procedural usine
+	// place 5 machine anywhere
+	for(int i = 0; i < 5; ++i)
+	{
+		u8 y = rand()%12;
+		u8 x = rand()%16;
+
+		gUsine.map[x*16 + y] = rand()%5;
+	}
+
 	resume();
 
 	// set as current
@@ -64,22 +88,21 @@ void GameHub::init()
 void GameHub::resume()
 {
 	// restore background(s)
-	int bg = bgInit(0, BgType_Text8bpp, BgSize_T_512x256, 0,1);
-	dmaCopy(test_usine_tilesetsTiles, bgGetGfxPtr(bg), sizeof(test_usine_tilesetsTiles));
+	gUsine.bg = bgInit(0, BgType_Text8bpp, BgSize_T_256x256, 0,1);
+	dmaCopy(test_usine_tilesetsTiles,bgGetGfxPtr(gUsine.bg), test_usine_tilesetsTilesLen);
 	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, sizeof(test_usine_tilesetsPal));
 
-	u16* mapPtr = bgGetMapPtr(bg);
-
-	/*
-	unsigned short map[2048];
-	for(int i = 0; i < 2048; ++i)
-		map[i] = 30;
-
-	dmaCopy(map, mapPtr, sizeof(map));//don't work need to check why
-	*/
-	for(int i = 0; i < 2048; ++i)
+	u16* mapPtr = bgGetMapPtr(gUsine.bg);
+	for(int i = 0; i < 24; ++i)
 	{
-		mapPtr[i] = 30;
+		for(int j = 0; j < 32; ++j)
+		{
+			u32 idx = i * 32 + j;
+			u8 x = i / 2;
+			u8 y = j / 2;
+
+			mapPtr[idx] = bgGetMapBase(gUsine.bg)+ ((gUsine.map[x*12 + y] == 0 ? 0 : 62)  * 4) + ((i%2)*2 + (j%2));
+		}
 	}
 
 	// reinit oam
@@ -109,12 +132,13 @@ void GameHub::update()
 			Game::start_game(0);
 		}
 	}
+
 }
 
 void GameHub::draw()
 {
 	// animate
-
+	bgUpdate();
 	// update the main screen oam
 	oamUpdate(&oamMain);
 }

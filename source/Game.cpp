@@ -1,6 +1,6 @@
 #include "Game.hpp"
 #include "GameHub.hpp"
-#include "Capitalist.hpp"
+#include "Capitalist_game.hpp"
 
 Game* Game::current;
 Game* const Game::games[] = { &Capitalist::capitalist };

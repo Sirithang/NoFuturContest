@@ -1,5 +1,5 @@
 #include <nds.h>
-#include "Capitalist.hpp"
+#include "Capitalist_game.hpp"
 #include "../assets/capitalist.h"
 
 #define CAPITALIST_SPRITE 0
