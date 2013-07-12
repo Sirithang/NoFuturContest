@@ -1,9 +1,10 @@
 #include <nds.h>
 #include "Capitalist_game.hpp"
 #include "../assets/capitalist.h"
+#include "../assets/bar.h"
 
-#define CAPITALIST_SPRITE 0
-#define CAPITALIST_TILE 0
+#define CAPITALIST_SPRITE (BAR_SPRITE + BAR_SPRITE_COUNT)
+#define CAPITALIST_TILE (BAR_TILE + BAR_TILE_COUNT*BAR_LENGTH)
 #define CAPITALIST_TILE_COUNT (8*8)
 #define CAPITALIST_TILE_SIZE (CAPITALIST_TILE_COUNT*32)
 
@@ -21,17 +22,19 @@ void Capitalist::init()
 	oamEnable(&oamMain);
 	oamInit(&oamMain, SpriteMapping_1D_32, false);
 
-	dmaCopy(capitalistTiles, oamGetGfxPtr(&oamMain, CAPITALIST_SPRITE), CAPITALIST_TILE_SIZE);
+	dmaCopy(capitalistTiles, oamGetGfxPtr(&oamMain, CAPITALIST_TILE), CAPITALIST_TILE_SIZE);
 	dmaCopy(capitalistPal, SPRITE_PALETTE, sizeof(capitalistPal));
 	
 	oamSet(	&oamMain, CAPITALIST_SPRITE, capitalist_x, capitalist_y, /*priority*/1, /*palette*/0,
 		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, CAPITALIST_TILE),
-		0, false, false, false, false, false);
+		-1, false, false, false, false, false);
 
 	bgHide(0);
 	bgHide(1);
 	bgHide(2);
 	bgHide(3);
+
+	Game::init();
 }
 
 void Capitalist::update()
@@ -58,7 +61,7 @@ void Capitalist::update()
 	
 	oamSet(	&oamMain, CAPITALIST_SPRITE, capitalist_x, capitalist_y, /*priority*/1, /*palette*/0,
 		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, CAPITALIST_TILE),
-		0, false, false, false, false, false);
+		-1, false, false, false, false, false);
 }
 
 void Capitalist::draw()
