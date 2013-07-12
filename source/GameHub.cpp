@@ -5,10 +5,9 @@
 
 #include "GameHub.hpp"
 #include "Objet.hpp"
+#include "Usine_map.hpp"
 
 #include <nds.h>
-#include <stdlib.h>
-#include <time.h>
 
 GameHub GameHub::hub;
 
@@ -24,11 +23,7 @@ GameHub GameHub::hub;
 
 Object playerObj;
 
-struct Usine
-{
-	int bg;
-	u16 map[12*16];
-} gUsine;
+UsineMap gUsine;
 
 void GameHub::init()
 {
@@ -64,20 +59,7 @@ void GameHub::init()
 	// init the main screen
 	// ********************
 
-	for(int i = 0; i < 12*16; ++i)
-		gUsine.map[i] = 0;
-
-	srand(time(NULL));
-
-	//create the procedural usine
-	// place 5 machine anywhere
-	for(int i = 0; i < 5; ++i)
-	{
-		u8 y = rand()%12;
-		u8 x = rand()%16;
-
-		gUsine.map[x*16 + y] = rand()%5;
-	}
+	usine::init(gUsine);
 
 	resume();
 
@@ -93,15 +75,17 @@ void GameHub::resume()
 	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, sizeof(test_usine_tilesetsPal));
 
 	u16* mapPtr = bgGetMapPtr(gUsine.bg);
-	for(int i = 0; i < 24; ++i)
+
+	for(int i = 0; i < 32; ++i)
 	{
-		for(int j = 0; j < 32; ++j)
+		for(int j = 0; j < 24; ++j)
 		{
-			u32 idx = i * 32 + j;
+			u32 idx = i + j * (256/8);
+
 			u8 x = i / 2;
 			u8 y = j / 2;
 
-			mapPtr[idx] = bgGetMapBase(gUsine.bg)+ ((gUsine.map[x*12 + y] == 0 ? 0 : 62)  * 4) + ((i%2)*2 + (j%2));
+			mapPtr[idx] = bgGetMapBase(gUsine.bg)+ ((gUsine.map[x + y*16] == 0 ? 17 : 61)  * 4) + ((i%2) + (j%2)*2);
 		}
 	}
 
@@ -127,7 +111,9 @@ void GameHub::update()
 		touchPosition position;
 		touchRead(&position);
 
-		// todo : check position.px and position.py 
+		Vec2i usineCase = usine::getCase(gUsine, position);
+
+		if(gUsine.map[usineCase.x + usineCase.y * 16] != 0)
 		{
 			Game::start_game(0);
 		}

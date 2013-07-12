@@ -51,6 +51,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="MakeFile" />
+    <None Include="source\Vector_math.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Capitalist_game.cpp" />
@@ -58,12 +59,14 @@
     <ClCompile Include="source\GameHub.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\Object.cpp" />
+    <ClCompile Include="source\Usine_map.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Capitalist_game.hpp" />
     <ClInclude Include="source\Game.hpp" />
     <ClInclude Include="source\GameHub.hpp" />
     <ClInclude Include="source\Objet.hpp" />
+    <ClInclude Include="source\Usine_map.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

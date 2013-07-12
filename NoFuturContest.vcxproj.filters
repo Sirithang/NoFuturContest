@@ -10,6 +10,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MakeFile" />
+    <None Include="source\Vector_math.inl">
+      <Filter>source</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\main.cpp">
@@ -27,6 +30,9 @@
     <ClCompile Include="source\Capitalist_game.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\Usine_map.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Game.hpp">
@@ -39,6 +45,9 @@
       <Filter>source</Filter>
     </ClInclude>
     <ClInclude Include="source\Capitalist_game.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Usine_map.hpp">
       <Filter>source</Filter>
     </ClInclude>
   </ItemGroup>
