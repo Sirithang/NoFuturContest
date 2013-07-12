@@ -23,6 +23,7 @@ SOURCES		:=	source assets
 INCLUDES	:=	include
 DATA		:=	data  
 GRAPHICS	:=	gfx  
+AUDIO		:=  audio
 ICON		:=
 
 # specify a directory which contains the nitro filesystem
@@ -53,7 +54,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project (order is important)
 #---------------------------------------------------------------------------------
-LIBS	:= 	-lnds9
+LIBS	:= 	-lnds9 -lmm9 
  
  
 #---------------------------------------------------------------------------------
@@ -82,7 +83,11 @@ CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) soundbank.bin
+
+# build audio file list, include full path
+export AUDIOFILES := $(foreach dir,$(notdir $(wildcard $(AUDIO)/*.*)),$(CURDIR)/$(AUDIO)/$(dir))
+
  
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -152,6 +157,13 @@ $(OUTPUT).elf	:	$(OFILES)
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	$(bin2o)
+
+#-------------------------------------------------------------
+# rule for generating soundbank file from audio files
+#-------------------------------------------------------------
+soundbank.bin:	$(AUDIOFILES)
+#-------------------------------------------------------------
+	@mmutil $^ -osoundbank.bin -hsoundbank.h -d
 
 #---------------------------------------------------------------------------------
 # This rule creates assembly source files using grit

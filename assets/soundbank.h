@@ -1,0 +1,4 @@
+#define MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT	0
+#define MSL_NSONGS	1
+#define MSL_NSAMPS	7
+#define MSL_BANKSIZE	8

@@ -3,6 +3,10 @@
 #include "Game.hpp"
 #include "GameHub.hpp"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 int main()
 {
 	lcdMainOnBottom();
@@ -11,6 +15,11 @@ int main()
 	vramSetBankB(VRAM_B_MAIN_SPRITE);
 	vramSetBankC(VRAM_C_SUB_BG);
 	vramSetBankD(VRAM_D_SUB_SPRITE);
+
+	// Use this if you have the soundbank loaded into memory
+    mmInitDefaultMem( (mm_addr)soundbank_bin );
+	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT );
+	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT, MM_PLAY_LOOP );
 		
 	while (true)
 	{
