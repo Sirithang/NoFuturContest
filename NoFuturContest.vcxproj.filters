@@ -50,5 +50,8 @@
     <ClInclude Include="source\Usine_map.hpp">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="source\globals.hpp">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

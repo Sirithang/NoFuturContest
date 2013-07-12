@@ -29,12 +29,14 @@ void Capitalist::init()
 		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, CAPITALIST_TILE),
 		-1, false, false, false, false, false);
 
-	bgHide(0);
-	bgHide(1);
-	bgHide(2);
-	bgHide(3);
+	//bgHide(0);
+	//bgHide(1);
+	//bgHide(2);
+	//bgHide(3);
 
 	Game::init();
+
+	writeTimed("\x1b[10;10HFrappe!", 1000);
 }
 
 void Capitalist::update()

@@ -1,9 +1,11 @@
 #include <nds.h>
 #include <math.h>
+#include <stdio.h>
 #include "Game.hpp"
 #include "GameHub.hpp"
 #include "Capitalist_game.hpp"
 #include "../assets/bar.h"
+#include "../assets/font.h"
 
 #define BAR_X ((256 - BAR_LENGTH*16)/2)
 #define BAR_Y 10
@@ -38,6 +40,21 @@ void Game::init()
 	oamSet(	&oamMain, BAR_SPRITE + BAR_LENGTH - 1, BAR_X + 16*(BAR_LENGTH - 1), BAR_Y, /*priority*/0, /*palette*/15,
 		SpriteSize_16x16, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, BAR_TILE + 4*BAR_TILE_COUNT),
 		-1, false, false, false, false, false);
+
+	//init console to write stuff and all
+	console = consoleInit(0,0, BgType_Text4bpp, BgSize_T_256x256, 0, 20, true, false);
+
+	ConsoleFont font;
+
+	font.gfx = (u16*)fontTiles;
+	font.pal = (u16*)fontPal;
+	font.numChars = 95;
+	font.numColors =  fontPalLen / 2;
+	font.bpp = 4;
+	font.asciiOffset = 32;
+	font.convertSingleColor = false;
+	
+	consoleSetFont(console, &font);
 	
 }
 
@@ -107,4 +124,29 @@ void Game::game_end(bool success)
 bool Game::is_game_playing()
 {
 	return current != &GameHub::hub;
+}
+
+//--------------------------------------
+
+int currentNbCalls = 0;
+int nbCallNeeded = 0;
+
+void timerCallBack()
+{
+	currentNbCalls++;
+	if(currentNbCalls >= nbCallNeeded)
+	{
+		consoleClear();
+		timerStop(0);
+	}
+}
+
+void Game::writeTimed(const char* message, int milliSeconds)
+{
+	currentNbCalls = 0;
+	nbCallNeeded = milliSeconds;
+
+	iprintf(message);
+
+	timerStart(0, ClockDivider_1024, TIMER_FREQ_1024(1000), timerCallBack);
 }

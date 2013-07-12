@@ -65,6 +65,7 @@
     <ClInclude Include="source\Capitalist_game.hpp" />
     <ClInclude Include="source\Game.hpp" />
     <ClInclude Include="source\GameHub.hpp" />
+    <ClInclude Include="source\globals.hpp" />
     <ClInclude Include="source\Objet.hpp" />
     <ClInclude Include="source\Usine_map.hpp" />
   </ItemGroup>

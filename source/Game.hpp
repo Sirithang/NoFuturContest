@@ -1,6 +1,8 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
+#include <nds.h>
+
 #define BAR_LENGTH 8
 #define BAR_SIZE (BAR_LENGTH*16 - 4)
 #define BAR_SPRITE 0
@@ -28,8 +30,12 @@ class Game
 	protected:
 		void init_timer(unsigned char sec, unsigned char frame);
 
+		void writeTimed(const char* message, int milliSeconds);
+
 		// counter for whatever we want
 		unsigned int counter;
+		//console to write
+		PrintConsole *console;
 
 	private:
 		// timer
