@@ -16,16 +16,16 @@ GameHub GameHub::hub;
 #define GROUND_HEIGHT 100
 #define JUMP_HEIGHT 56
 
-#define PLAYER_SPRITE 0
-#define PLAYER_TILE 0
-#define PLAYER_TILE_COUNT (8*8)
-#define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
-
 #define OBSTACLE_COUNT 10
-#define OBSTACLE_SPRITE (PLAYER_SPRITE + 1)
-#define OBSTACLE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
+#define OBSTACLE_SPRITE 0
+#define OBSTACLE_TILE 0
 #define OBSTACLE_TILE_COUNT (4*4*2)
 #define OBSTACLE_TILE_SIZE (OBSTACLE_TILE_COUNT*32)
+
+#define PLAYER_SPRITE (OBSTACLE_SPRITE + NUM_OBSTACLE)
+#define PLAYER_TILE (OBSTACLE_TILE + OBSTACLE_COUNT*OBSTACLE_TILE_COUNT)
+#define PLAYER_TILE_COUNT (8*8)
+#define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
 
 Object playerObj;
 
@@ -132,6 +132,7 @@ void GameHub::update()
 
 		if(gUsine.map[usineCase.x + usineCase.y * 16] != 0)
 		{
+			minigame_obstacle = current_obstacle;
 			Game::start_game(0);
 		}
 	}
@@ -261,3 +262,9 @@ void GameHub::new_obstacle()
 
 	next_obstacle_frame = 150;
 }
+
+void GameHub::minigame_success()
+{
+	obstacles[minigame_obstacle].success = true;
+}
+

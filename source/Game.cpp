@@ -115,7 +115,10 @@ void Game::start_game(int game)
 
 void Game::game_end(bool success)
 {
-	GameHub::hub.game_succeed = true;
+	if (success)
+	{
+		GameHub::hub.minigame_success();
+	}
 	GameHub::hub.resume();
 
 	current = &GameHub::hub;

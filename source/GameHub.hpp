@@ -10,8 +10,6 @@ class GameHub : public Game
 	public:
 		unsigned short player_life;
 
-		bool game_succeed;
-
 		virtual void init();
 		void resume();
 		virtual void update();
@@ -21,6 +19,8 @@ class GameHub : public Game
 		void draw_top();
 		
 		static GameHub hub;
+
+		void minigame_success();
 
 	private:
 		GameHub() {}
@@ -37,6 +37,7 @@ class GameHub : public Game
 		};
 		
 		Obstacle obstacles[NUM_OBSTACLE];
+		unsigned char minigame_obstacle;
 		unsigned char current_obstacle;
 		short next_obstacle_frame;
 
