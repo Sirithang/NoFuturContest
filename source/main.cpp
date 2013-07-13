@@ -17,9 +17,9 @@ int main()
 	vramSetBankD(VRAM_D_SUB_SPRITE);
 
 	// Use this if you have the soundbank loaded into memory
-    	mmInitDefaultMem( (mm_addr)soundbank_bin );
-	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT );
-	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT, MM_PLAY_LOOP );
+    mmInitDefaultMem( (mm_addr)soundbank_bin );
+	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU );
+	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU, MM_PLAY_LOOP );
 		
 	while (true)
 	{
