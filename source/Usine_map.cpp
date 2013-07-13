@@ -12,8 +12,6 @@ void usine::init(UsineMap& obj)
 	for(int i = 0; i < 12*16; ++i)
 		obj.map[i] = 0;
 
-	srand(time(NULL));
-
 	//create the procedural usine
 	// place 5 machine anywhere
 	for(int i = 0; i < 5; ++i)
