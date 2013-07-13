@@ -3,7 +3,6 @@
 #include "../assets/zorro_jump.h"
 #include "../assets/zorro_fall.h"
 #include "../assets/obstacle.h"
-#include "../assets/test_usine_tilesets.h"
 
 #include "GameHub.hpp"
 #include "Objet.hpp"
@@ -87,24 +86,7 @@ void GameHub::init()
 void GameHub::resume()
 {
 	// restore background(s)
-	gUsine.bg = bgInit(0, BgType_Text8bpp, BgSize_T_256x256, 0,1);
-	dmaCopy(test_usine_tilesetsTiles,bgGetGfxPtr(gUsine.bg), test_usine_tilesetsTilesLen);
-	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, sizeof(test_usine_tilesetsPal));
-
-	u16* mapPtr = bgGetMapPtr(gUsine.bg);
-
-	for(int i = 0; i < 32; ++i)
-	{
-		for(int j = 0; j < 24; ++j)
-		{
-			u32 idx = i + j * (256/8);
-
-			u8 x = i / 2;
-			u8 y = j / 2;
-
-			mapPtr[idx] = bgGetMapBase(gUsine.bg)+ ((gUsine.map[x + y*16] == 0 ? 17 : 61)  * 4) + ((i%2) + (j%2)*2);
-		}
-	}
+	usine::restoreGraphics(gUsine);
 
 	// reinit oam
 	oamClear(&oamMain, 0, 0);
@@ -113,12 +95,15 @@ void GameHub::resume()
 
 	// restore OAM tiles
 
+	usine::restoreSprite(gUsine);
+
 	// position sprites
 }
 
 void GameHub::update()
 {
 	// one frame forward
+	usine::update(gUsine);
 
 	// check if it is time to click minigame
 	// and the correct game is clicked
@@ -130,7 +115,7 @@ void GameHub::update()
 
 		Vec2i usineCase = usine::getCase(gUsine, position);
 
-		if(gUsine.map[usineCase.x + usineCase.y * 16] != 0)
+		if(gUsine.map[usineCase.x + usineCase.y * gUsine.w] != 0)
 		{
 			minigame_obstacle = current_obstacle;
 			Game::start_game(1);
@@ -141,8 +126,6 @@ void GameHub::update()
 
 void GameHub::draw()
 {
-	// animate
-	bgUpdate();
 	// update the main screen oam
 	oamUpdate(&oamMain);
 }
