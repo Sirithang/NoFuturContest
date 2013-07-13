@@ -1,5 +1,7 @@
 #include "../assets/player.h"
-#include "../assets/zorro_spriteset.h"
+#include "../assets/zorro_run.h"
+#include "../assets/zorro_jump.h"
+#include "../assets/zorro_fall.h"
 #include "../assets/obstacle.h"
 #include "../assets/test_usine_tilesets.h"
 
@@ -11,14 +13,18 @@
 
 GameHub GameHub::hub;
 
+#define GROUND_HEIGHT 100
+#define JUMP_HEIGHT 56
+
 #define PLAYER_SPRITE 0
 #define PLAYER_TILE 0
 #define PLAYER_TILE_COUNT (8*8)
 #define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
 
+#define OBSTACLE_COUNT 10
 #define OBSTACLE_SPRITE (PLAYER_SPRITE + 1)
 #define OBSTACLE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
-#define OBSTACLE_TILE_COUNT (4*4)
+#define OBSTACLE_TILE_COUNT (4*4*2)
 #define OBSTACLE_TILE_SIZE (OBSTACLE_TILE_COUNT*32)
 
 Object playerObj;
@@ -46,13 +52,24 @@ void GameHub::init()
 	playerObj.palette = 0;
 
 	// load player's first frame
-	player_frame = 0;
-	dmaCopy(zorro_spritesetTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
-	dmaCopy(zorro_spritesetPal, SPRITE_PALETTE_SUB, sizeof(zorro_spritesetPal));
+	actual_frame = 0;
+	anim = RUN;
+	dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+	dmaCopy(zorro_runPal, SPRITE_PALETTE_SUB, sizeof(zorro_runPal));
+
+	// load obstacle tileset
+	dmaCopy(obstacleTiles, oamGetGfxPtr(&oamSub, OBSTACLE_TILE), sizeof(obstacleTiles));
+	dmaCopy(obstaclePal, SPRITE_PALETTE_SUB + 224, sizeof(obstaclePal));
 
 	// init the gameplay variables
 	player_life = 100;
-	obstacle_type = 1;
+
+	for (int i = 0; i < NUM_OBSTACLE; ++i)
+	{
+		obstacles[i].active = false;
+	}
+
+	current_obstacle = 0;
 	new_obstacle();
 
 	// ********************
@@ -131,48 +148,116 @@ void GameHub::draw()
 
 void GameHub::update_top()
 {
-	if (obstacle_position > -50)
+	++actual_frame;
+
+	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
-		--obstacle_position;
+		--obstacles[i].position;
+		
+		if (obstacles[i].position < -32)
+		{
+			obstacles[i].active = false;
+		}
+		else if (obstacles[i].position == 48)
+		{
+			anim = obstacles[i].success ? FALL : JUMP;
+			actual_frame = 0;
+		}
 	}
-	else
+
+	--next_obstacle_frame;
+	if (next_obstacle_frame <= 0)
 	{
 		// throw in another obstacle
 		new_obstacle();
 	}
 
-	// player
-	oamSet(	&oamSub, playerObj.sprite, /*x*/playerObj.x, /*y*/playerObj.y, /*priority*/0, /*palette*/playerObj.palette,
-		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, playerObj.tile),
-		0, false, false, false, false, false);
+	
+	for (int i = 0; i < NUM_OBSTACLE; ++i)
+	{
+		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, GROUND_HEIGHT + 32, /*priority*/0, /*palette*/0,
+			SpriteSize_32x32/*?*/, SpriteColorFormat_256Color, oamGetGfxPtr(&oamSub, OBSTACLE_TILE + obstacles[i].type*OBSTACLE_TILE_COUNT),
+			-1, false, !obstacles[i].active, false, false, false);
+	}
 
-	// obstacle
-	oamSet(	&oamSub, OBSTACLE_SPRITE, /*x*/obstacle_position, /*y*/0, /*priority*/0, /*palette*/0,
-		SpriteSize_32x32/*?*/, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, OBSTACLE_TILE),
-		0, false, false, false, false, false);
+	int y = GROUND_HEIGHT;
+	if (anim == JUMP)
+	{
+		// do not factorise ! we don't want to lose precision, so divisions MUST come last
+		y -= (actual_frame*JUMP_HEIGHT - actual_frame*actual_frame*JUMP_HEIGHT/64)/16;
+	}
+
+	// player
+	oamSet(	&oamSub, PLAYER_SPRITE, /*x*/0, y, /*priority*/0, /*palette*/0,
+		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, playerObj.tile),
+		-1, false, false, false, false, false);
+
 }
 
 void GameHub::draw_top()
 {
 	// animate tiles
-	if ((frame_counter & 0x7) == 0)
+	if ((actual_frame & 0x7) == 0)
 	{
-		player_frame = player_frame < 5 ? player_frame + 1 : 0;
-		dmaCopy(zorro_spritesetTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+		int player_frame = actual_frame/8;
+
+		if (anim == RUN)
+		{
+			if (player_frame >= 6)
+			{
+				actual_frame = 0;
+				player_frame = 0;
+			}
+			dmaCopy(zorro_runTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+		}
+		else if (anim == JUMP)
+		{
+			if (player_frame >= 8)
+			{
+				actual_frame = 0;
+				player_frame = 0;
+				anim = RUN;
+				dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+			}
+			else
+			{
+				dmaCopy(zorro_jumpTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+			}
+		}
+		else // FALL
+		{
+			if (player_frame >= 8)
+			{
+				actual_frame = 0;
+				player_frame = 0;
+				anim = RUN;
+				dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+			}
+			else
+			{
+				dmaCopy(zorro_fallTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+			}
+		}
 	}
 
 	// update the OAM
 	oamUpdate(&oamSub);
-
-	++frame_counter;
 }
 
 void GameHub::new_obstacle()
 {
-	obstacle_type = obstacle_type == 1 ? 0 : 1; // todo : RNG
-	obstacle_position = 270;
-	game_succeed = false;
+	unsigned char type = obstacles[current_obstacle].type + 1;
 
-	// get the obstacle sprite
-	dmaCopy(obstacleTiles + OBSTACLE_TILE_SIZE*obstacle_type, oamGetGfxPtr(&oamSub, OBSTACLE_TILE), OBSTACLE_TILE_SIZE);
+	++current_obstacle;
+	if (current_obstacle >= NUM_OBSTACLE)
+	{
+		current_obstacle = 0;
+	}
+
+	obstacles[current_obstacle].type = type == OBSTACLE_COUNT ? 0 : type; // todo : RNG
+	obstacles[current_obstacle].position = 256;
+	obstacles[current_obstacle].success = false;
+	obstacles[current_obstacle].active = true;
+
+	next_obstacle_frame = 150;
 }

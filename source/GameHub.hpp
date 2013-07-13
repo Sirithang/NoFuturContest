@@ -3,14 +3,13 @@
 
 #include "Game.hpp"
 
+#define NUM_OBSTACLE 5
+
 class GameHub : public Game
 {
 	public:
-		unsigned char player_frame;
 		unsigned short player_life;
 
-		short obstacle_position;
-		unsigned char obstacle_type;
 		bool game_succeed;
 
 		virtual void init();
@@ -28,6 +27,28 @@ class GameHub : public Game
 		~GameHub() {}
 
 		unsigned char frame_counter;
+
+		struct Obstacle
+		{
+			short position;
+			unsigned char type;
+			bool success;
+			bool active;
+		};
+		
+		Obstacle obstacles[NUM_OBSTACLE];
+		unsigned char current_obstacle;
+		short next_obstacle_frame;
+
+		enum PlayerAnim
+		{
+			RUN,
+			JUMP,
+			FALL,
+		};
+		PlayerAnim anim;
+		unsigned short actual_frame;
+
 		void new_obstacle();
 };
 
