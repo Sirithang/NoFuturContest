@@ -3,6 +3,7 @@
 #include "../assets/zorro_jump.h"
 #include "../assets/zorro_fall.h"
 #include "../assets/obstacle.h"
+#include "../assets/symbole.h"
 
 #include "GameHub.hpp"
 #include "Objet.hpp"
@@ -25,6 +26,9 @@ GameHub GameHub::hub;
 #define PLAYER_TILE (OBSTACLE_TILE + OBSTACLE_COUNT*OBSTACLE_TILE_COUNT)
 #define PLAYER_TILE_COUNT (8*8)
 #define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
+
+#define ICONE_SPRITE (PLAYER_SPRITE + 1)
+#define ICONE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
 
 Object playerObj;
 
@@ -59,6 +63,10 @@ void GameHub::init()
 	// load obstacle tileset
 	dmaCopy(obstacleTiles, oamGetGfxPtr(&oamSub, OBSTACLE_TILE), sizeof(obstacleTiles));
 	dmaCopy(obstaclePal, SPRITE_PALETTE_SUB + 224, sizeof(obstaclePal));
+
+	//load icone tileset
+	dmaCopy(symboleTiles, oamGetGfxPtr(&oamSub, ICONE_TILE), sizeof(symboleTiles));
+	dmaCopy(symbolePal, SPRITE_PALETTE_SUB + 16, sizeof(symbolePal));
 
 	// init the gameplay variables
 	player_life = 100;
@@ -114,9 +122,11 @@ void GameHub::update()
 		touchRead(&position);
 
 		Vec2i usineCase = usine::getCase(gUsine, position);
-
-		if(gUsine.map[usineCase.x + usineCase.y * gUsine.w] != 0)
+		int idx = usineCase.x + usineCase.y * gUsine.w;
+		if(gUsine._machines[idx].obstacle == obstacles[current_obstacle].iconeType)
 		{
+			gUsine._machines[idx].workerSpritesheetOffset = SPRITESHEET_WORK;
+
 			minigame_obstacle = current_obstacle;
 			Game::start_game(1);
 		}
@@ -162,6 +172,11 @@ void GameHub::update_top()
 		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, GROUND_HEIGHT + 32, /*priority*/0, /*palette*/0,
 			SpriteSize_32x32/*?*/, SpriteColorFormat_256Color, oamGetGfxPtr(&oamSub, OBSTACLE_TILE + obstacles[i].type*OBSTACLE_TILE_COUNT),
 			-1, false, !obstacles[i].active, false, false, false);
+
+		//set icone
+
+		oamSet( &oamSub, PLAYER_SPRITE + i, obstacles[i].position + 32, GROUND_HEIGHT + 32, 0, 1, SpriteSize_32x16, SpriteColorFormat_16Color, 
+			oamGetGfxPtr(&oamMain, ICONE_TILE + (int)obstacles[i].iconeType * 8), 0, false,  !obstacles[i].active, true, false, false);
 	}
 
 	int y = GROUND_HEIGHT;
@@ -238,10 +253,12 @@ void GameHub::new_obstacle()
 		current_obstacle = 0;
 	}
 
-	obstacles[current_obstacle].type = type == OBSTACLE_COUNT ? 0 : type; // todo : RNG
+	obstacles[current_obstacle].type = type == OBSTACLE_COUNT ? (ObstacleType)0 : (ObstacleType)type; // todo : RNG
 	obstacles[current_obstacle].position = 256;
 	obstacles[current_obstacle].success = false;
 	obstacles[current_obstacle].active = true;
+
+	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
 
 	next_obstacle_frame = 150;
 }

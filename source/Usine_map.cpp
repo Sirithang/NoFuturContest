@@ -1,6 +1,7 @@
 #include "Usine_map.hpp"
 #include "../assets/test_usine_tilesets.h"
 
+#include "../assets/symbole.h"
 #include "../assets/work.h"
 
 #include <stdlib.h>
@@ -11,9 +12,27 @@
 
 #define WORKER_TILE_SIZE (4*4*32)
 
+#define ANIM_SLEEP (SPRITESHEET_WORK+16*12)
+
+
 u16 upperSprite = 0;
 
 using namespace usine;
+
+//---------------------------------------------------------------
+
+void workCallback()
+{
+
+}
+
+void machine::startWork(Machine& mach)
+{
+
+}
+
+
+//---------------------------------------------------------------
 
 void usine::init(UsineMap& obj)
 {
@@ -23,6 +42,9 @@ void usine::init(UsineMap& obj)
 	for(int i = 0; i < obj.w*obj.h; ++i)
 		obj.map[i] = 0;
 
+	int obstacleSpawned[8];
+	for(int i = 0; i < 8; ++i)
+		obstacleSpawned[i] = 0;
 
 	for(int i = 0; i < obj.w; ++i)
 	{
@@ -39,11 +61,21 @@ void usine::init(UsineMap& obj)
 			obj._machines[idx].y = y * USINE_CASE_T;
 			obj._machines[idx].type = type;
 
-			obj._machines[idx].workerSprite = upperSprite;
+			int obstRand = rand()%MAX_OBSTACLE_TYPE;
+			while(obstacleSpawned[obstRand] > 1)
+			{
+				obstRand = rand()%MAX_OBSTACLE_TYPE;
+			}
+
+			obstacleSpawned[obstRand] += 1;
+
+			obj._machines[idx].obstacle = (ObstacleType)obstRand;
+			obj._machines[idx].iconeSprite = upperSprite++;
+
+			obj._machines[idx].workerSpritesheetOffset = ANIM_SLEEP;
+			obj._machines[idx].workerSprite = upperSprite++;
 			obj._machines[idx].workerFrame = rand()%6;
 			obj._machines[idx].workerFrameCounter = 0;
-
-			upperSprite += 1;
 		}
 	}
 }
@@ -88,16 +120,12 @@ void usine::restoreGraphics(UsineMap& obj)
 
 void usine::restoreSprite(UsineMap& obj)
 {
-	dmaCopy(workTiles, oamGetGfxPtr(&oamMain, 0), sizeof(workTiles));
-	dmaCopy(workPal, SPRITE_PALETTE, sizeof(workPal));
+	dmaCopy(symboleTiles, oamGetGfxPtr(&oamMain, ICONE_SPRITESHEET), sizeof(symboleTiles));
+	dmaCopy(workTiles, oamGetGfxPtr(&oamMain, SPRITESHEET_WORK), sizeof(workTiles));
 
-	//for(int i = 0; i < NUMBER_MACHINES; ++i)
-	//{
-	//	Machine mach = obj._machines[i];
-	//	oamSet(	&oamMain, mach.workerSprite, /*x*/mach.x, /*y*/mach.y, /*priority*/0, /*palette*/0,
-	//		SpriteSize_32x32, SpriteColorFormat_256Color, oamGetGfxPtr(&oamMain, WORKER_TILE_SIZE*4),
-	//	0, false, false, false, false, false);
-	//}
+	//dmaCopy(symbolePal, SPRITE_PALETTE, sizeof(symbolePal));
+	dmaCopy(workPal, SPRITE_PALETTE, sizeof(workPal));
+	dmaCopy(symbolePal, SPRITE_PALETTE + 16, sizeof(symbolePal));
 }
 
 void usine::update(UsineMap& obj)
@@ -113,8 +141,11 @@ void usine::update(UsineMap& obj)
 		}
 
 		oamSet(	&oamMain, mach.workerSprite, /*x*/mach.x+16, /*y*/mach.y+32, /*priority*/0, /*palette*/0,
-			SpriteSize_32x32, SpriteColorFormat_256Color, oamGetGfxPtr(&oamMain, 32*mach.workerFrame),
+			SpriteSize_32x32, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, mach.workerSpritesheetOffset+ 16*mach.workerFrame),
 		0, false, false, false, false, false);
+
+		oamSet( &oamMain, mach.iconeSprite, mach.x, mach.y, 0, 1, SpriteSize_32x16, SpriteColorFormat_16Color, 
+			oamGetGfxPtr(&oamMain, (int)mach.obstacle * 8), 0, false, false, false, false, false);
 
 		obj._machines[i] = mach;
 	}
