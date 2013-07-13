@@ -115,6 +115,7 @@ void Game::start_game(int game)
 
 void Game::game_end(bool success)
 {
+	timerStop(0);
 	if (success)
 	{
 		GameHub::hub.minigame_success();

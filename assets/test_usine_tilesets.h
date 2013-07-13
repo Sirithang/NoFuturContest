@@ -3,14 +3,14 @@
 
 //======================================================================
 //
-//	test_usine_tilesets, 256x256@8, 
+//	test_usine_tilesets, 256x64@8, 
 //	+ palette 256 entries, not compressed
-//	+ 1024 tiles not compressed
-//	+ regular map (flat), not compressed, 16x16 
-//	Metatiled by 2x2
-//	Total size: 512 + 65536 + 2048 + 512 = 68608
+//	+ 256 tiles not compressed
+//	+ regular map (flat), not compressed, 4x1 
+//	Metatiled by 8x8
+//	Total size: 512 + 16384 + 512 + 8 = 17416
 //
-//	Time-stamp: 2013-07-11, 23:20:16
+//	Time-stamp: 2013-07-13, 13:49:51
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -19,17 +19,17 @@
 #ifndef GRIT_TEST_USINE_TILESETS_H
 #define GRIT_TEST_USINE_TILESETS_H
 
-#define test_usine_tilesetsTilesLen 65536
-extern const unsigned char test_usine_tilesetsTiles[65536];
+#define test_usine_tilesetsTilesLen 16384
+extern const unsigned short test_usine_tilesetsTiles[8192];
 
-#define test_usine_tilesetsMetaTilesLen 2048
-extern const unsigned char test_usine_tilesetsMetaTiles[2048];
+#define test_usine_tilesetsMetaTilesLen 512
+extern const unsigned short test_usine_tilesetsMetaTiles[256];
 
-#define test_usine_tilesetsMetaMapLen 512
-extern const unsigned char test_usine_tilesetsMetaMap[512];
+#define test_usine_tilesetsMetaMapLen 8
+extern const unsigned short test_usine_tilesetsMetaMap[4];
 
 #define test_usine_tilesetsPalLen 512
-extern const unsigned char test_usine_tilesetsPal[512];
+extern const unsigned short test_usine_tilesetsPal[256];
 
 #endif // GRIT_TEST_USINE_TILESETS_H
 
