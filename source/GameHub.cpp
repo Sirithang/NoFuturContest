@@ -133,7 +133,7 @@ void GameHub::update()
 		if(gUsine.map[usineCase.x + usineCase.y * 16] != 0)
 		{
 			minigame_obstacle = current_obstacle;
-			Game::start_game(0);
+			Game::start_game(1);
 		}
 	}
 
