@@ -207,7 +207,8 @@ void GameHub::update_top()
 			if(current_level < 2)
 			{
 				const int nbObstaclePerLevel[3] = {4,6,9};
-				const int speeds[3] = {1, 2,2};
+				const int speeds[3] = {1,2,2};
+				const int tempos[3] = {820, 922, 1024};
 
 				current_level_obstacle_count++;
 
@@ -216,6 +217,8 @@ void GameHub::update_top()
 					current_level++;
 					current_level_obstacle_count = 0;
 					speed = speeds[current_level];
+					mmSetModuleTempo( tempos[current_level] );
+					mmPosition( 0 );
 				}
 			}
 
@@ -304,7 +307,7 @@ void GameHub::draw_top()
 			else
 			{
 				dmaCopy(zorro_jumpTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
-				//if(player_frame == 0) mmEffect( SFX_JUMP );
+				if(player_frame == 0) mmEffect( SFX_JUMP );
 			}
 		}
 		else // FALL
