@@ -5,7 +5,10 @@
 
 #include <maxmod9.h>    // Maxmod definitions for ARM9
 
-#include "../assets/ecran_titre.h"
+#include "../assets/titre.h"
+#include "../assets/titre_bas.h"
+#include "../assets/touche_pour_commencer.h"
+
 #include "../assets/soundbank.h"
 #include "../assets/soundbank_bin.h"  // Soundbank definitions
 
@@ -34,29 +37,64 @@ int main()
 
 	// MUSIC
 	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU );
-	mmSetModuleVolume( 512 );	// = 1/2
-	mmSetModuleTempo( 820 );	// =~ 74.5 bpm
+	mmSetModuleVolume(512);	// = 1/2
+	mmSetModuleTempo(820);	// =~ 74.5 bpm
 	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU, MM_PLAY_LOOP );
 	
 	while (true)
 	{
 		// setup title screen
-		int bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
-		dmaCopy(ecran_titreTiles, bgGetGfxPtr(bg), sizeof(ecran_titreTiles));
-		dmaCopy(ecran_titreMap, bgGetMapPtr(bg), sizeof(ecran_titreMap));
-		dmaCopy(ecran_titrePal, BG_PALETTE_SUB, sizeof(ecran_titrePal));
+		int bg1 = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+		dmaCopy(titreTiles, bgGetGfxPtr(bg1), sizeof(titreTiles));
+		dmaCopy(titreMap, bgGetMapPtr(bg1), sizeof(titreMap));
+		dmaCopy(titrePal, BG_PALETTE_SUB, sizeof(titrePal));
+		
+		int bg2 = bgInit(3, BgType_Text4bpp, BgSize_T_256x256, 0, 1);
+		dmaCopy(titre_basTiles, bgGetGfxPtr(bg2), sizeof(titre_basTiles));
+		dmaCopy(titre_basMap, bgGetMapPtr(bg2), sizeof(titre_basMap));
+		dmaCopy(titre_basPal, BG_PALETTE, sizeof(titre_basPal));
+
+		int bg3 = bgInit(2, BgType_Text4bpp, BgSize_T_256x256, 1, 2);
+		dmaCopy(touche_pour_commencerTiles, bgGetGfxPtr(bg3), sizeof(touche_pour_commencerTiles));
+		dmaCopy(touche_pour_commencerMap, bgGetMapPtr(bg3), sizeof(touche_pour_commencerMap));
+		dmaCopy(touche_pour_commencerPal, BG_PALETTE + 16, sizeof(touche_pour_commencerPal));
+
+		REG_BLDCNT = BLEND_ALPHA | BLEND_SRC_BG2 | BLEND_DST_BG3;
 
 		unsigned int time = 0;
+		unsigned int alpha = 0;
 
 		// title screen loop
 		do
 		{
+			if ((time % 2) == 0)
+			{
+				++alpha;
+				if (alpha > 32)
+				{
+					alpha = 0;
+				}
+
+				if (alpha <= 16)
+				{
+					REG_BLDALPHA = alpha | ((16 - alpha) << 8);
+				}
+				else
+				{
+					REG_BLDALPHA = (32 - alpha) | ((alpha - 16) << 8);
+				}
+			}
+
 			swiWaitForVBlank();
 			++time;
 			scanKeys();
 		} while (!(keysDown() & (KEY_START | KEY_TOUCH)));
 
-		bgHide(bg);
+		bgHide(bg1);
+		bgHide(bg2);
+		bgHide(bg3);
+
+		REG_BLDCNT = 0;
 
 		srand(time);
 
