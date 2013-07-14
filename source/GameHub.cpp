@@ -5,8 +5,7 @@
 #include "../assets/obstacle.h"
 #include "../assets/symbole.h"
 
-#include "../assets/background_haut_l.h"
-#include "../assets/background_haut_r.h"
+#include "../assets/background_haut.h"
 
 #include "GameHub.hpp"
 #include "Objet.hpp"
@@ -55,20 +54,11 @@ void GameHub::init()
 	// setup background
 	BG_PALETTE_SUB[0] = 0;
 
-	bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_512x256, 0, 1);
-	dmaCopy(background_haut_lTiles, bgGetGfxPtr(bg), sizeof(background_haut_lTiles));
-	dmaCopy(background_haut_lMap, bgGetMapPtr(bg), sizeof(background_haut_lMap));
+	bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+	dmaCopy(background_hautTiles, bgGetGfxPtr(bg), sizeof(background_hautTiles));
+	dmaCopy(background_hautMap, bgGetMapPtr(bg), sizeof(background_hautMap));
 
-	dmaCopy(background_haut_rTiles, bgGetGfxPtr(bg) + sizeof(background_haut_lTiles)/2, sizeof(background_haut_rTiles));
-	//dmaCopy(background_haut_rMap, bgGetMapPtr(bg) + 32*32, sizeof(background_haut_rMap));
-
-	dmaCopy(background_haut_lPal, BG_PALETTE_SUB, sizeof(background_haut_lPal));
-
-	u16* ptr = bgGetMapPtr(bg);
-	for(int i = 0; i < (768); ++i)
-	{
-		ptr[1024 + i] = 768+i;
-	}
+	dmaCopy(background_hautPal, BG_PALETTE_SUB, sizeof(background_hautPal));
 
 	// init oam
 	oamClear(&oamSub, 0, 0);
@@ -97,9 +87,7 @@ void GameHub::init()
 
 
 	// init the gameplay variables
-	state = PLAYING;
-	player_life = 5;
-	remaining_obstacles = 20;
+	player_life = 100;
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
@@ -123,6 +111,8 @@ void GameHub::init()
 	current_level = 0;
 	current_level_obstacle_count = 0;
 	speed = 1;
+
+	nextBgScroll = 0;
 }
 
 void GameHub::resume()
@@ -191,15 +181,7 @@ void GameHub::update_top()
 		}
 		else if (obstacles[i].position == positionJump[current_level])
 		{
-			if (obstacles[i].success)
-			{
-				--player_life;
-				anim = FALL;
-			}
-			else
-			{
-				anim = JUMP;
-			}
+			anim = obstacles[i].success ? FALL : JUMP;
 			actual_frame = 0;
 			--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
 		}
@@ -213,8 +195,7 @@ void GameHub::update_top()
 			if(current_level < 2)
 			{
 				const int nbObstaclePerLevel[3] = {4,6,9};
-				const int speeds[3] = {1,2,2};
-				const int tempos[3] = {820, 922, 1024};
+				const int speed_lev[3] = {1, 2,2};
 
 				current_level_obstacle_count++;
 
@@ -222,9 +203,7 @@ void GameHub::update_top()
 				{
 					current_level++;
 					current_level_obstacle_count = 0;
-					speed = speeds[current_level];
-					mmSetModuleTempo( tempos[current_level] );
-					mmPosition( 0 );
+					speed = speed_lev[current_level];
 				}
 			}
 
@@ -232,7 +211,14 @@ void GameHub::update_top()
 			new_obstacle();
 		}
 
-		bgScroll(bg, +speed, 0);
+		if(nextBgScroll == 0)
+		{
+			bgScroll(bg, +speed, 0);
+			nextBgScroll = 30;
+		}
+		
+		nextBgScroll--;
+
 		bgUpdate();
 	}
 
@@ -272,14 +258,6 @@ void GameHub::update_top()
 		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, playerObj.tile),
 		-1, false, false, false, false, false);
 
-	if (player_life <= 0)
-	{
-		state = WIN;
-	}
-	if (remaining_obstacles <= 0 && obstacles[current_obstacle].active == false)
-	{
-		state = LOSE;
-	}
 }
 
 void GameHub::draw_top()
@@ -340,26 +318,21 @@ void GameHub::draw_top()
 
 void GameHub::new_obstacle()
 {
-	if (remaining_obstacles > 0)
+	++current_obstacle;
+	if (current_obstacle >= NUM_OBSTACLE)
 	{
-		--remaining_obstacles;
-
-		++current_obstacle;
-		if (current_obstacle >= NUM_OBSTACLE)
-		{
-			current_obstacle = 0;
-		}
-
-		obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
-		obstacles[current_obstacle].position = 256;
-		obstacles[current_obstacle].success = false;
-		obstacles[current_obstacle].active = true;
-
-		obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
-
-		const int nbFrames[3]= {150, 90, 60};
-		next_obstacle_frame = nbFrames[current_level];
+		current_obstacle = 0;
 	}
+
+	obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
+	obstacles[current_obstacle].position = 256;
+	obstacles[current_obstacle].success = false;
+	obstacles[current_obstacle].active = true;
+
+	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
+
+	const int nbFrames[3]= {150, 90, 60};
+	next_obstacle_frame = nbFrames[current_level];
 }
 
 void GameHub::minigame_success()

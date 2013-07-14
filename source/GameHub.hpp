@@ -58,6 +58,8 @@ class GameHub : public Game
 		unsigned char current_obstacle;
 		short next_obstacle_frame;
 
+		u16 nextBgScroll;
+
 		enum PlayerAnim
 		{
 			RUN,
