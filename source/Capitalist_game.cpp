@@ -3,6 +3,10 @@
 #include "../assets/soviet.h"
 #include "../assets/bar.h"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 #define SOVIET_SPRITE (BAR_SPRITE + BAR_SPRITE_COUNT)
 #define SOVIET_TILE (BAR_TILE + BAR_TILE_COUNT*5)
 #define SOVIET_TILE_COUNT (8*8)
@@ -52,7 +56,7 @@ void Capitalist::update()
 				touch.py > soviet->y && touch.py < soviet->y + 64)
 			{
 				++counter;
-
+				mmEffect( SFX_TOUCH );
 				if (counter >= 3)
 				{
 					game_end(true);
