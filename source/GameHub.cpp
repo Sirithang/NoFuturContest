@@ -98,6 +98,10 @@ void GameHub::init()
 
 	// set as current
 	Game::current = this;
+
+	current_level = 0;
+	current_level_obstacle_count = 0;
+	speed = 1;
 }
 
 void GameHub::resume()
@@ -156,13 +160,15 @@ void GameHub::update_top()
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
 		if(anim != FALL)
-			--obstacles[i].position;
+			obstacles[i].position -= speed;
 		
+		const int positionJump[3] = {48, 46, 46};
+
 		if (obstacles[i].position < -32)
 		{
 			obstacles[i].active = false;
 		}
-		else if (obstacles[i].position == 48)
+		else if (obstacles[i].position == positionJump[current_level])
 		{
 			anim = obstacles[i].success ? FALL : JUMP;
 			actual_frame = 0;
@@ -175,6 +181,21 @@ void GameHub::update_top()
 		--next_obstacle_frame;
 		if (next_obstacle_frame <= 0)
 		{
+			if(current_level < 2)
+			{
+				const int nbObstaclePerLevel[3] = {4,6,9};
+				const int speed[3] = {1, 2,2};
+
+				current_level_obstacle_count++;
+
+				if(current_level_obstacle_count == nbObstaclePerLevel[current_level])
+				{
+					current_level++;
+					current_level_obstacle_count = 0;
+					speed = speed[current_level];
+				}
+			}
+
 			// throw in another obstacle
 			new_obstacle();
 		}
@@ -208,7 +229,7 @@ void GameHub::update_top()
 	if (anim == JUMP)
 	{
 		// do not factorise ! we don't want to lose precision, so divisions MUST come last
-		y -= (actual_frame*JUMP_HEIGHT - actual_frame*actual_frame*JUMP_HEIGHT/64)/16;
+		y -= (actual_frame*JUMP_HEIGHT - actual_frame*actual_frame*JUMP_HEIGHT/64)/(16*speed);
 	}
 
 	// player
@@ -289,7 +310,8 @@ void GameHub::new_obstacle()
 
 	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
 
-	next_obstacle_frame = 150;
+	const int nbFrames[3]= {150, 90, 60};
+	next_obstacle_frame = nbFrames[current_level];
 }
 
 void GameHub::minigame_success()

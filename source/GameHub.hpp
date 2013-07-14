@@ -29,6 +29,10 @@ class GameHub : public Game
 
 		unsigned char frame_counter;
 
+		u8 current_level;
+		u8 current_level_obstacle_count;
+		u8 speed; // over 16 to get the actual speed
+
 		struct Obstacle
 		{
 			short position;

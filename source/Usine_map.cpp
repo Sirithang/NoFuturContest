@@ -81,7 +81,8 @@ void usine::init(UsineMap& obj)
 			obj._machines[idx].type = type;
 
 			int obstRand = rand()%MAX_OBSTACLE_TYPE;
-			while(obstacleSpawned[obstRand] > ((idx < 5)?0:2))
+			int max = (idx < 8)?1:2;
+			while(obstacleSpawned[obstRand] > max)
 			{
 				obstRand = rand()%MAX_OBSTACLE_TYPE;
 			}
