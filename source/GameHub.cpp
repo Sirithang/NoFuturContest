@@ -55,14 +55,20 @@ void GameHub::init()
 	// setup background
 	BG_PALETTE_SUB[0] = 0;
 
-	int bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_512x256, 0, 1);
+	bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_512x256, 0, 1);
 	dmaCopy(background_haut_lTiles, bgGetGfxPtr(bg), sizeof(background_haut_lTiles));
 	dmaCopy(background_haut_lMap, bgGetMapPtr(bg), sizeof(background_haut_lMap));
 
-	dmaCopy(background_haut_rTiles, bgGetGfxPtr(bg)+ sizeof(background_haut_lTiles)/sizeof(u16), sizeof(background_haut_rTiles));
-	dmaCopy(background_haut_rMap, bgGetMapPtr(bg) + sizeof(background_haut_lMap)/sizeof(u16), sizeof(background_haut_rMap));
+	dmaCopy(background_haut_rTiles, bgGetGfxPtr(bg) + sizeof(background_haut_lTiles)/2, sizeof(background_haut_rTiles));
+	//dmaCopy(background_haut_rMap, bgGetMapPtr(bg) + 32*32, sizeof(background_haut_rMap));
 
 	dmaCopy(background_haut_lPal, BG_PALETTE_SUB, sizeof(background_haut_lPal));
+
+	u16* ptr = bgGetMapPtr(bg);
+	for(int i = 0; i < (768); ++i)
+	{
+		ptr[1024 + i] = 768+i;
+	}
 
 	// init oam
 	oamClear(&oamSub, 0, 0);
@@ -226,7 +232,7 @@ void GameHub::update_top()
 			new_obstacle();
 		}
 
-		bgScroll(bg, -1, 0);
+		bgScroll(bg, +speed, 0);
 		bgUpdate();
 	}
 
