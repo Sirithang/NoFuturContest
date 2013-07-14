@@ -227,7 +227,8 @@ void GameHub::update_top()
 		if (next_obstacle_frame <= 0)
 		{
 			const int nbObstaclePerLevel[3] = {4,6,9};
-			const int speed_lev[3] = {1, 2,2};
+			const int speed_lev[3] = {1,2,2};
+			const int tempo_lev[3] = {820,922,1024};
 
 			current_level_obstacle_count++;
 
@@ -238,6 +239,8 @@ void GameHub::update_top()
 					current_level++;
 					current_level_obstacle_count = 0;
 					speed = speed_lev[current_level];
+					mmSetModuleTempo( tempo_lev[current_level] );
+					mmPosition( 0 );
 				}
 				else
 				{

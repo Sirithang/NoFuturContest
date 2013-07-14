@@ -84,7 +84,7 @@ void Game::update()
 			GameHub::hub.resume();
 			current = &GameHub::hub;
 
-			mmSetModuleVolume( 512 );	// = 1/4
+			mmSetModuleVolume( 768 );	// = 3/4
 			mmEffectCancel(sfxhandle_hurry_up);
 		}
 
