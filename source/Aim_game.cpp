@@ -80,17 +80,20 @@ void Aim::update()
 	// timeout
 	Game::update();
 
-	if (keysDown() & KEY_TOUCH)
+	if (!finished)
 	{
-		touchPosition touch;
-		touchRead(&touch);
-
-		SpriteEntry* capitalist = oamMain.oamMemory + SOVIET_SPRITE + capitalist_sprite;
-
-		if (	touch.px > capitalist->x && touch.px < capitalist->x + 64 &&
-			touch.py > capitalist->y && touch.py < capitalist->y + 64)
+		if (keysDown() & KEY_TOUCH)
 		{
-			game_end(true);
+			touchPosition touch;
+			touchRead(&touch);
+
+			SpriteEntry* capitalist = oamMain.oamMemory + SOVIET_SPRITE + capitalist_sprite;
+
+			if (	touch.px > capitalist->x && touch.px < capitalist->x + 64 &&
+				touch.py > capitalist->y && touch.py < capitalist->y + 64)
+			{
+				game_end(true);
+			}
 		}
 	}
 

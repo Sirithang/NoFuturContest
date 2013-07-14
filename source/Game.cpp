@@ -9,12 +9,18 @@
 #include "../assets/bar.h"
 #include "../assets/font.h"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 #define BAR_X ((256 - BAR_LENGTH*16)/2)
 #define BAR_Y 10
 
 Game* Game::current;
 Game* const Game::games[] = { &Capitalist::capitalist, &Dalton::dalton, &Aim::aim };
 const int Game::game_count = sizeof(Game::games)/sizeof(Game*);
+
+mm_sfxhand sfxhandle_hurry_up;
 
 void Game::init_timer(unsigned char sec, unsigned char frame)
 {
@@ -58,10 +64,33 @@ void Game::init()
 	
 	consoleSetFont(console, &font);
 	
+	finished = 0;
+	frameSinceFinished = 0;
 }
 
 void Game::update()
 {
+	if(finished)
+	{
+		frameSinceFinished--;
+
+		if(frameSinceFinished == 0)
+		{
+			timerStop(0);
+			if (success)
+			{
+				GameHub::hub.minigame_success();
+			}
+			GameHub::hub.resume();
+			current = &GameHub::hub;
+
+			mmSetModuleVolume( 512 );	// = 1/4
+			mmEffectCancel(sfxhandle_hurry_up);
+		}
+
+		return;
+	}
+
 	if (timer_remaining_total_frame == 0)
 	{
 		game_end(false);
@@ -113,18 +142,23 @@ void Game::start_game(int game)
 {
 	current = games[game];
 	current->init();
+
+	mmSetModuleVolume( 256 );	// = 1/4
+	sfxhandle_hurry_up = mmEffect( SFX_HURRY_UP );
 }
 
 void Game::game_end(bool success)
 {
-	timerStop(0);
-	if (success)
-	{
-		GameHub::hub.minigame_success();
-	}
-	GameHub::hub.resume();
+	current->success = success;
+	current->finished = 1;
+	current->frameSinceFinished = 30;
 
-	current = &GameHub::hub;
+	timerStop(0);
+
+	if(success)
+		current->writeTimed(current->winSentence, 500);
+	else
+		current->writeTimed(current->looseSentence, 500);
 }
 
 bool Game::is_game_playing()
@@ -149,6 +183,9 @@ void timerCallBack()
 
 void Game::writeTimed(const char* message, int milliSeconds)
 {
+	consoleClear();
+	timerStop(0);
+
 	currentNbCalls = 0;
 	nbCallNeeded = milliSeconds;
 

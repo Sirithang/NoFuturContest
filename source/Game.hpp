@@ -26,7 +26,6 @@ class Game
 		static Game* const games[];
 		static Game* current;
 
-
 	protected:
 		void init_timer(unsigned char sec, unsigned char frame);
 
@@ -37,6 +36,12 @@ class Game
 		//console to write
 		PrintConsole *console;
 
+		const char* winSentence;
+		const char* looseSentence;
+		Game(const char* win = "\x1b[10;10HVictoire!", const char* loose = "\x1b[10;10HEchec!") : winSentence(win), looseSentence(loose){}
+
+		u8 finished;
+
 	private:
 		// timer
 		unsigned char timer_sec;
@@ -46,6 +51,9 @@ class Game
 		unsigned char timer_remaining_sec;
 		unsigned char timer_remaining_frame; // 1/60th sec
 		unsigned short timer_remaining_total_frame;
+
+		u8 success;
+		u16 frameSinceFinished;
 };
 
 #endif

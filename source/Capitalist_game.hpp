@@ -13,7 +13,7 @@ class Capitalist : public Game
 		static Capitalist capitalist;
 
 	private:
-		Capitalist() {}
+		Capitalist() : Game("\x1b[10;10HVictoire!", "\x1b[10;10HEchec!") {}
 
 		unsigned char frame;
 		unsigned char anim;

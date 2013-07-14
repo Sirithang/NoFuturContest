@@ -1,4 +1,10 @@
-#define MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT	0
+#define SFX_FALL	0
+#define SFX_HURRY_UP	1
+#define SFX_JUMP	2
+#define MOD_SENOR_ZORRO_ZA_RABOTU	0
+#define SFX_STEP_LEFT	10
+#define SFX_STEP_RIGHT	11
+#define SFX_TOUCH	12
 #define MSL_NSONGS	1
-#define MSL_NSAMPS	7
-#define MSL_BANKSIZE	8
+#define MSL_NSAMPS	13
+#define MSL_BANKSIZE	14

@@ -2,6 +2,7 @@
 #define GAME_HUB_HPP
 
 #include "Game.hpp"
+#include "Usine_map.hpp"
 
 #define NUM_OBSTACLE 5
 
@@ -34,6 +35,7 @@ class GameHub : public Game
 			unsigned char type;
 			bool success;
 			bool active;
+			ObstacleType iconeType;
 		};
 		
 		Obstacle obstacles[NUM_OBSTACLE];

@@ -3,6 +3,10 @@
 #include "../assets/buildings.h"
 #include "../assets/bar.h"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 #define DALTON_SPRITE (BAR_SPRITE + BAR_SPRITE_COUNT)
 #define DALTON_TILE (BAR_TILE + BAR_TILE_COUNT*5)
 #define DALTON_TILE_COUNT (4*8)
@@ -53,34 +57,39 @@ void Dalton::update()
 	// timeout
 	Game::update();
 
-	if (keysDown() & KEY_TOUCH)
+	if (!finished)
 	{
-		touchPosition touch;
-		touchRead(&touch);
-
-		if (	touch.px >= 64 + 32*positions[counter] && touch.px <= 64 + 32*(positions[counter] + 1) &&
-			touch.py >= 64 && touch.py <= 128)
+		if (keysDown() & KEY_TOUCH)
 		{
-			++counter;
+			touchPosition touch;
+			touchRead(&touch);
 
-			if (counter > 3)
+			if (	touch.px >= 64 + 32*positions[counter] && touch.px <= 64 + 32*(positions[counter] + 1) &&
+				touch.py >= 64 && touch.py <= 128)
 			{
-				game_end(true);
+				++counter;
+
+				mmEffect( SFX_TOUCH );
+
+				if (counter > 3)
+				{
+					game_end(true);
+				}
 			}
 		}
-	}
 	
-	for (unsigned int i = 0; i < counter; ++i)
-	{
-		oamSet(	&oamMain, DALTON_SPRITE + positions[i], 64 + 32*positions[i], 64, /*priority*/1, /*palette*/1,
-			SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
-			-1, false, false, false, false, false);
-	}
-	for (unsigned int i = counter; i < 4; ++i)
-	{
-		oamSet(	&oamMain, DALTON_SPRITE + positions[i], 64 + 32*positions[i], 64, /*priority*/1, /*palette*/0,
-			SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
-			-1, false, false, false, false, false);
+		for (unsigned int i = 0; i < counter; ++i)
+		{
+			oamSet(	&oamMain, DALTON_SPRITE + positions[i], 64 + 32*positions[i], 64, /*priority*/1, /*palette*/1,
+				SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
+				-1, false, false, false, false, false);
+		}
+		for (unsigned int i = counter; i < 4; ++i)
+		{
+			oamSet(	&oamMain, DALTON_SPRITE + positions[i], 64 + 32*positions[i], 64, /*priority*/1, /*palette*/0,
+				SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
+				-1, false, false, false, false, false);
+		}
 	}
 }
 

@@ -22,10 +22,21 @@ int main()
 	vramSetBankC(VRAM_C_SUB_BG);
 	vramSetBankD(VRAM_D_SUB_SPRITE);
 
-	// Use this if you have the soundbank loaded into memory
-    	mmInitDefaultMem( (mm_addr)soundbank_bin );
-	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT );
-	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT, MM_PLAY_LOOP );
+	mmInitDefaultMem( (mm_addr)soundbank_bin );
+
+	// SFX
+	mmLoadEffect( SFX_FALL );
+	mmLoadEffect( SFX_HURRY_UP );
+	mmLoadEffect( SFX_JUMP );
+	mmLoadEffect( SFX_STEP_LEFT );
+	mmLoadEffect( SFX_STEP_RIGHT );
+	mmLoadEffect( SFX_TOUCH );
+
+	// MUSIC
+	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU );
+	mmSetModuleVolume( 512 );	// = 1/2
+	mmSetModuleTempo( 820 );	// =~ 74.5 bpm
+	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU, MM_PLAY_LOOP );
 	
 	while (true)
 	{

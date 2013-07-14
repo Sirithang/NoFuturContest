@@ -3,6 +3,7 @@
 #include "../assets/zorro_jump.h"
 #include "../assets/zorro_fall.h"
 #include "../assets/obstacle.h"
+#include "../assets/symbole.h"
 
 #include "GameHub.hpp"
 #include "Objet.hpp"
@@ -10,6 +11,10 @@
 
 #include <nds.h>
 #include <math.h>
+
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
 
 GameHub GameHub::hub;
 
@@ -26,6 +31,10 @@ GameHub GameHub::hub;
 #define PLAYER_TILE (OBSTACLE_TILE + OBSTACLE_COUNT*OBSTACLE_TILE_COUNT)
 #define PLAYER_TILE_COUNT (8*8)
 #define PLAYER_TILE_SIZE (PLAYER_TILE_COUNT*32)
+
+#define ICONE_SPRITE (PLAYER_SPRITE + 1)
+#define ICONE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
+#define ICONE_SPRITE (PLAYER_SPRITE + 1)
 
 Object playerObj;
 
@@ -61,6 +70,12 @@ void GameHub::init()
 	// load obstacle tileset
 	dmaCopy(obstacleTiles, oamGetGfxPtr(&oamSub, OBSTACLE_TILE), sizeof(obstacleTiles));
 	dmaCopy(obstaclePal, SPRITE_PALETTE_SUB + 224, sizeof(obstaclePal));
+
+	//load icone tileset
+	dmaCopy(symboleTiles, oamGetGfxPtr(&oamSub, ICONE_TILE), sizeof(symboleTiles));
+	dmaCopy(symbolePal, SPRITE_PALETTE_SUB + 16, 32);
+	dmaCopy(symbolePal+32, SPRITE_PALETTE_SUB + 32, 32);
+
 
 	// init the gameplay variables
 	player_life = 100;
@@ -116,9 +131,11 @@ void GameHub::update()
 		touchRead(&position);
 
 		Vec2i usineCase = usine::getCase(gUsine, position);
-
-		if(gUsine.map[usineCase.x + usineCase.y * gUsine.w] != 0)
+		int idx = usineCase.x + usineCase.y * gUsine.w;
+		if(gUsine._machines[idx].obstacle == obstacles[current_obstacle].iconeType && gUsine._machines[idx].usable)
 		{
+			machine::startWork(gUsine._machines[idx]);
+
 			minigame_obstacle = current_obstacle;
 			Game::start_game(obstacles[minigame_obstacle].type);
 		}
@@ -138,7 +155,8 @@ void GameHub::update_top()
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
-		--obstacles[i].position;
+		if(anim != FALL)
+			--obstacles[i].position;
 		
 		if (obstacles[i].position < -32)
 		{
@@ -148,22 +166,42 @@ void GameHub::update_top()
 		{
 			anim = obstacles[i].success ? FALL : JUMP;
 			actual_frame = 0;
+			--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
 		}
 	}
 
-	--next_obstacle_frame;
-	if (next_obstacle_frame <= 0)
+	if(anim != FALL)
 	{
-		// throw in another obstacle
-		new_obstacle();
+		--next_obstacle_frame;
+		if (next_obstacle_frame <= 0)
+		{
+			// throw in another obstacle
+			new_obstacle();
+		}
 	}
 
 	
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
-		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, GROUND_HEIGHT + 32, /*priority*/0, /*palette*/0,
+		//set icone
+		int y = GROUND_HEIGHT + 32;
+		if(anim == FALL && obstacles[i].position <= 48)
+		{
+			y += actual_frame;
+			if(actual_frame == 8)
+			{
+				obstacles[i].active = false;
+			}
+		}
+
+		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, y, /*priority*/1, /*palette*/0,
 			SpriteSize_32x32/*?*/, SpriteColorFormat_256Color, oamGetGfxPtr(&oamSub, OBSTACLE_TILE + obstacles[i].type*OBSTACLE_TILE_COUNT),
 			-1, false, !obstacles[i].active, false, false, false);
+
+		bool show = obstacles[i].active && (i == current_obstacle || obstacles[i].success);
+
+		oamSet( &oamSub, ICONE_SPRITE + i, obstacles[i].position - 16, y - 16, 0, obstacles[i].success?2:1, SpriteSize_32x16, SpriteColorFormat_16Color, 
+			oamGetGfxPtr(&oamMain, ICONE_TILE + (int)obstacles[i].iconeType * 8), 0, false,  !show, true, false, false);
 	}
 
 	int y = GROUND_HEIGHT;
@@ -195,6 +233,8 @@ void GameHub::draw_top()
 				player_frame = 0;
 			}
 			dmaCopy(zorro_runTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+			if(player_frame == 0)		mmEffect( SFX_STEP_LEFT );
+			else if(player_frame == 3)	mmEffect( SFX_STEP_RIGHT );
 		}
 		else if (anim == JUMP)
 		{
@@ -204,10 +244,12 @@ void GameHub::draw_top()
 				player_frame = 0;
 				anim = RUN;
 				dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				mmEffect( SFX_STEP_LEFT );
 			}
 			else
 			{
 				dmaCopy(zorro_jumpTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				if(player_frame == 0) mmEffect( SFX_JUMP );
 			}
 		}
 		else // FALL
@@ -218,10 +260,12 @@ void GameHub::draw_top()
 				player_frame = 0;
 				anim = RUN;
 				dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				mmEffect( SFX_STEP_LEFT );
 			}
 			else
 			{
 				dmaCopy(zorro_fallTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				if(player_frame == 0) mmEffect( SFX_FALL );
 			}
 		}
 	}
@@ -242,6 +286,8 @@ void GameHub::new_obstacle()
 	obstacles[current_obstacle].position = 256;
 	obstacles[current_obstacle].success = false;
 	obstacles[current_obstacle].active = true;
+
+	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
 
 	next_obstacle_frame = 150;
 }

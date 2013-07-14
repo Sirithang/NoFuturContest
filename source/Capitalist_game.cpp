@@ -39,21 +39,24 @@ void Capitalist::update()
 	// timeout
 	Game::update();
 
-	if (keysDown() & KEY_TOUCH)
+	if (!finished)
 	{
-		touchPosition touch;
-		touchRead(&touch);
-
-		SpriteEntry* soviet = oamMain.oamMemory + SOVIET_SPRITE;
-
-		if (	touch.px > soviet->x && touch.px < soviet->x + 64 &&
-			touch.py > soviet->y && touch.py < soviet->y + 64)
+		if (keysDown() & KEY_TOUCH)
 		{
-			++counter;
+			touchPosition touch;
+			touchRead(&touch);
 
-			if (counter >= 3)
+			SpriteEntry* soviet = oamMain.oamMemory + SOVIET_SPRITE;
+
+			if (	touch.px > soviet->x && touch.px < soviet->x + 64 &&
+				touch.py > soviet->y && touch.py < soviet->y + 64)
 			{
-				game_end(true);
+				++counter;
+
+				if (counter >= 3)
+				{
+					game_end(true);
+				}
 			}
 		}
 	}
