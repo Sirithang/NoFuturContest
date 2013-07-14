@@ -63,9 +63,9 @@ void GameHub::init()
 	// setup background
 	BG_PALETTE_SUB[0] = 0;
 
-	bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
-	dmaCopy(background_hautTiles, bgGetGfxPtr(bg), sizeof(background_hautTiles));
+	bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_512x256, 0, 1);
 	dmaCopy(background_hautMap, bgGetMapPtr(bg), sizeof(background_hautMap));
+	dmaCopy(background_hautTiles, bgGetGfxPtr(bg), sizeof(background_hautTiles));
 
 	dmaCopy(background_hautPal, BG_PALETTE_SUB, sizeof(background_hautPal));
 

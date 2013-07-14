@@ -3,13 +3,13 @@
 
 //======================================================================
 //
-//	background_haut, 256x256@8, 
-//	+ palette 256 entries, not compressed
-//	+ 266 tiles (t|f reduced) not compressed
-//	+ regular map (flat), not compressed, 32x32 
-//	Total size: 512 + 17024 + 2048 = 19584
+//	background_haut, 512x256@8, 
+//	+ palette 64 entries, not compressed
+//	+ 500 tiles (t|f reduced) not compressed
+//	+ regular map (in SBBs), not compressed, 64x32 
+//	Total size: 128 + 32000 + 4096 = 36224
 //
-//	Time-stamp: 2013-07-14, 22:39:06
+//	Time-stamp: 2013-07-15, 00:21:06
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -18,14 +18,14 @@
 #ifndef GRIT_BACKGROUND_HAUT_H
 #define GRIT_BACKGROUND_HAUT_H
 
-#define background_hautTilesLen 17024
-extern const unsigned char background_hautTiles[17024];
+#define background_hautTilesLen 32000
+extern const unsigned short background_hautTiles[16000];
 
-#define background_hautMapLen 2048
-extern const unsigned char background_hautMap[2048];
+#define background_hautMapLen 4096
+extern const unsigned short background_hautMap[2048];
 
-#define background_hautPalLen 512
-extern const unsigned char background_hautPal[512];
+#define background_hautPalLen 128
+extern const unsigned short background_hautPal[64];
 
 #endif // GRIT_BACKGROUND_HAUT_H
 
