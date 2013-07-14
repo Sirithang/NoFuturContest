@@ -11,6 +11,10 @@
 
 #include <nds.h>
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 GameHub GameHub::hub;
 
 #define GROUND_HEIGHT 100
@@ -208,6 +212,8 @@ void GameHub::draw_top()
 				player_frame = 0;
 			}
 			dmaCopy(zorro_runTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+			if(player_frame == 0)		mmEffect( SFX_STEP_LEFT );
+			else if(player_frame == 3)	mmEffect( SFX_STEP_RIGHT );
 		}
 		else if (anim == JUMP)
 		{
@@ -217,10 +223,12 @@ void GameHub::draw_top()
 				player_frame = 0;
 				anim = RUN;
 				dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				mmEffect( SFX_STEP_LEFT );
 			}
 			else
 			{
 				dmaCopy(zorro_jumpTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				if(player_frame == 0) mmEffect( SFX_JUMP );
 			}
 		}
 		else // FALL
@@ -231,10 +239,12 @@ void GameHub::draw_top()
 				player_frame = 0;
 				anim = RUN;
 				dmaCopy(zorro_runTiles, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				mmEffect( SFX_STEP_LEFT );
 			}
 			else
 			{
 				dmaCopy(zorro_fallTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
+				if(player_frame == 0) mmEffect( SFX_FALL );
 			}
 		}
 	}

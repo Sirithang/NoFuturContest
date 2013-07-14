@@ -8,12 +8,18 @@
 #include "../assets/bar.h"
 #include "../assets/font.h"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 #define BAR_X ((256 - BAR_LENGTH*16)/2)
 #define BAR_Y 10
 
 Game* Game::current;
 Game* const Game::games[] = { &Capitalist::capitalist, &Dalton::dalton };
 const int Game::game_count = sizeof(Game::games)/sizeof(Game*);
+
+mm_sfxhand sfxhandle_hurry_up;
 
 void Game::init_timer(unsigned char sec, unsigned char frame)
 {
@@ -112,6 +118,9 @@ void Game::start_game(int game)
 {
 	current = games[game];
 	current->init();
+
+	mmSetModuleVolume( 256 );	// = 1/4
+	sfxhandle_hurry_up = mmEffect( SFX_HURRY_UP );
 }
 
 void Game::game_end(bool success)
@@ -124,6 +133,9 @@ void Game::game_end(bool success)
 	GameHub::hub.resume();
 
 	current = &GameHub::hub;
+
+	mmSetModuleVolume( 512 );	// = 1/4
+	mmEffectCancel(sfxhandle_hurry_up);
 }
 
 bool Game::is_game_playing()

@@ -3,6 +3,10 @@
 #include "../assets/buildings.h"
 #include "../assets/bar.h"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 #define DALTON_SPRITE (BAR_SPRITE + BAR_SPRITE_COUNT)
 #define DALTON_TILE (BAR_TILE + BAR_TILE_COUNT*BAR_LENGTH)
 #define DALTON_TILE_COUNT (4*8)
@@ -67,6 +71,8 @@ void Dalton::update()
 			touch.py >= 64 && touch.py <= 128)
 		{
 			++counter;
+
+			mmEffect( SFX_TOUCH );
 
 			if (counter > 3)
 			{
