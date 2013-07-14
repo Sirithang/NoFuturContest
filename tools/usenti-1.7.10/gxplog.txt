@@ -1,24 +1,21 @@
 STATUS: Validatating gr.
 WARNING:   No explicit src path.
 STATUS: Validation succeeded.
-STATUS: Started run at: 2013-07-11, 23:20:16
+STATUS: Started run at: 2013-07-14, 23:11:29
 STATUS: Validatating gr.
 STATUS: Validation succeeded.
 STATUS: Preparing data.
 STATUS: Work-DIB creation.
-STATUS: Work-DIB creation complete: 256x256@8.
+STATUS: Work-DIB creation complete: 160x16@8.
 STATUS: Tile preparation.
 STATUS:   tiling to 16x16 tiles.
 STATUS:   tiling to 8x8 tiles.
 STATUS: Tile preparation complete.
-STATUS: Map preparation.
-STATUS:   No tile reduction.
-STATUS:   Performing metatile reduction (2, 2).
-STATUS: Map preparation complete.
 STATUS: Graphics preparation.
+STATUS:   Bitpacking: 8 -> 4.
 STATUS: Graphics preparation complete.
 STATUS: Palette preparation.
 STATUS: Palette preparation complete.
 STATUS: Data preparation complete.
-STATUS: Export to C: test_usine_tilesets into E:\DS\NoFuturContest\assets\test_usine_tilesets.c .
+STATUS: Export to C: vie_couleurs into E:\DS\NoFuturContest\assets\vie_couleurs.c .
 STATUS: Run completed :).

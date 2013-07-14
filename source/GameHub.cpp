@@ -7,6 +7,9 @@
 
 #include "../assets/background_haut.h"
 
+#include "../assets/vie.h"
+#include "../assets/vie_couleurs.h"
+
 #include "GameHub.hpp"
 #include "Objet.hpp"
 #include "Usine_map.hpp"
@@ -36,7 +39,13 @@ GameHub GameHub::hub;
 
 #define ICONE_SPRITE (PLAYER_SPRITE + 1)
 #define ICONE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
+#define ICONE_TILE_COUNT (4*2*8)
 #define ICONE_SPRITE (PLAYER_SPRITE + 1)
+
+//to fucking be sur to not overlap
+#define VIE_SPRITE 60
+#define VIE_TILE (ICONE_TILE+ICONE_TILE_COUNT)
+#define VIE_COLOR_TILE (VIE_TILE+ 4*2*5)
 
 Object playerObj;
 
@@ -85,11 +94,15 @@ void GameHub::init()
 	dmaCopy(symbolePal, SPRITE_PALETTE_SUB + 16, 32);
 	dmaCopy(symbolePal+32, SPRITE_PALETTE_SUB + 32, 32);
 
+	//load life bar
+	dmaCopy(vieTiles, oamGetGfxPtr(&oamSub, VIE_TILE), sizeof(vieTiles));
+	dmaCopy(viePal, SPRITE_PALETTE_SUB + 48, sizeof(viePal));
+
+	dmaCopy(vie_couleursTiles, oamGetGfxPtr(&oamSub, VIE_COLOR_TILE), sizeof(vie_couleursTiles));
+	dmaCopy(vie_couleursPal, SPRITE_PALETTE_SUB + 64, sizeof(vie_couleursPal));
 
 	// init the gameplay variables
-	state = PLAYING;
-	player_life = 5;
-	remaining_obstacles = 20;
+	player_life = 0;
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
@@ -113,6 +126,8 @@ void GameHub::init()
 	current_level = 0;
 	current_level_obstacle_count = 0;
 	speed = 1;
+
+	nextBgScroll = 0;
 }
 
 void GameHub::resume()
@@ -181,17 +196,23 @@ void GameHub::update_top()
 		}
 		else if (obstacles[i].position == positionJump[current_level])
 		{
-			if (obstacles[i].success)
-			{
-				--player_life;
-				anim = FALL;
-			}
-			else
-			{
-				anim = JUMP;
-			}
+			anim = obstacles[i].success ? FALL : JUMP;
 			actual_frame = 0;
 			--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
+
+			if(!Game::is_game_playing())
+			{
+				if(anim == FALL)
+				{
+					if(player_life < 10)
+						player_life += 1;
+				}
+				else
+				{
+					if(player_life > 0)
+						player_life -= 1;
+				}
+			}
 		}
 	}
 
@@ -200,29 +221,43 @@ void GameHub::update_top()
 		--next_obstacle_frame;
 		if (next_obstacle_frame <= 0)
 		{
-			if(current_level < 2)
+			const int nbObstaclePerLevel[3] = {4,6,9};
+			const int speed_lev[3] = {1, 2,2};
+
+			current_level_obstacle_count++;
+
+			if(current_level_obstacle_count == nbObstaclePerLevel[current_level])
 			{
-				const int nbObstaclePerLevel[3] = {4,6,9};
-				const int speeds[3] = {1,2,2};
-				const int tempos[3] = {820, 922, 1024};
-
-				current_level_obstacle_count++;
-
-				if(current_level_obstacle_count == nbObstaclePerLevel[current_level])
+				if(current_level < 2)
 				{
 					current_level++;
 					current_level_obstacle_count = 0;
-					speed = speeds[current_level];
-					mmSetModuleTempo( tempos[current_level] );
-					mmPosition( 0 );
+					speed = speed_lev[current_level];
+				}
+				else
+				{
+					if(player_life >= 6)
+					{
+						state = WIN;
+					}
+					else
+					{
+						state = LOSE;
+					}
 				}
 			}
 
-			// throw in another obstacle
 			new_obstacle();
 		}
 
-		bgScroll(bg, +speed, 0);
+		if(nextBgScroll == 0)
+		{
+			bgScroll(bg, +speed, 0);
+			nextBgScroll = 30;
+		}
+		
+		nextBgScroll--;
+
 		bgUpdate();
 	}
 
@@ -262,13 +297,18 @@ void GameHub::update_top()
 		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, playerObj.tile),
 		-1, false, false, false, false, false);
 
-	if (player_life <= 0)
+
+	//draw lifebar
+
+	for(int i = 0; i < 5; ++i)
 	{
-		state = WIN;
+		oamSet(&oamSub, VIE_SPRITE+i, SCREEN_WIDTH/2 - 160/2 + i*32, 10, 0, 3, SpriteSize_32x16, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, VIE_TILE + i*8), 0, false,  false, false, false, false);
 	}
-	if (remaining_obstacles <= 0 && obstacles[current_obstacle].active == false)
+
+	for(int i = 0; i < 10; ++i)
 	{
-		state = LOSE;
+		bool show = player_life > i;
+		oamSet(&oamSub, VIE_SPRITE+5+i, SCREEN_WIDTH/2 - 160/2 + i*16, 10, 0, 4, SpriteSize_16x16, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, VIE_COLOR_TILE + i*4), 0, false, !show, false, false, false);
 	}
 }
 
@@ -330,26 +370,21 @@ void GameHub::draw_top()
 
 void GameHub::new_obstacle()
 {
-	if (remaining_obstacles > 0)
+	++current_obstacle;
+	if (current_obstacle >= NUM_OBSTACLE)
 	{
-		--remaining_obstacles;
-
-		++current_obstacle;
-		if (current_obstacle >= NUM_OBSTACLE)
-		{
-			current_obstacle = 0;
-		}
-
-		obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
-		obstacles[current_obstacle].position = 256;
-		obstacles[current_obstacle].success = false;
-		obstacles[current_obstacle].active = true;
-
-		obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
-
-		const int nbFrames[3]= {150, 90, 60};
-		next_obstacle_frame = nbFrames[current_level];
+		current_obstacle = 0;
 	}
+
+	obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
+	obstacles[current_obstacle].position = 256;
+	obstacles[current_obstacle].success = false;
+	obstacles[current_obstacle].active = true;
+
+	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
+
+	const int nbFrames[3]= {150, 100, 80};
+	next_obstacle_frame = nbFrames[current_level];
 }
 
 void GameHub::minigame_success()
