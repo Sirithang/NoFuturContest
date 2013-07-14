@@ -42,8 +42,8 @@ void usine::init(UsineMap& obj)
 	for(int i = 0; i < obj.w*obj.h; ++i)
 		obj.map[i] = 0;
 
-	int obstacleSpawned[8];
-	for(int i = 0; i < 8; ++i)
+	int obstacleSpawned[MAX_OBSTACLE_TYPE];
+	for(int i = 0; i < MAX_OBSTACLE_TYPE; ++i)
 		obstacleSpawned[i] = 0;
 
 	for(int i = 0; i < obj.w; ++i)
@@ -62,7 +62,7 @@ void usine::init(UsineMap& obj)
 			obj._machines[idx].type = type;
 
 			int obstRand = rand()%MAX_OBSTACLE_TYPE;
-			while(obstacleSpawned[obstRand] > 1)
+			while(obstacleSpawned[obstRand] > ((idx < 5)?0:2))
 			{
 				obstRand = rand()%MAX_OBSTACLE_TYPE;
 			}

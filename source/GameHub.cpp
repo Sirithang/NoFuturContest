@@ -33,6 +33,7 @@ GameHub GameHub::hub;
 
 #define ICONE_SPRITE (PLAYER_SPRITE + 1)
 #define ICONE_TILE (PLAYER_TILE + PLAYER_TILE_COUNT)
+#define ICONE_SPRITE (PLAYER_SPRITE + 1)
 
 Object playerObj;
 
@@ -70,7 +71,9 @@ void GameHub::init()
 
 	//load icone tileset
 	dmaCopy(symboleTiles, oamGetGfxPtr(&oamSub, ICONE_TILE), sizeof(symboleTiles));
-	dmaCopy(symbolePal, SPRITE_PALETTE_SUB + 16, sizeof(symbolePal));
+	dmaCopy(symbolePal, SPRITE_PALETTE_SUB + 16, 32);
+	dmaCopy(symbolePal+32, SPRITE_PALETTE_SUB + 32, 32);
+
 
 	// init the gameplay variables
 	player_life = 100;
@@ -150,7 +153,8 @@ void GameHub::update_top()
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
-		--obstacles[i].position;
+		if(anim != FALL)
+			--obstacles[i].position;
 		
 		if (obstacles[i].position < -32)
 		{
@@ -160,27 +164,42 @@ void GameHub::update_top()
 		{
 			anim = obstacles[i].success ? FALL : JUMP;
 			actual_frame = 0;
+			--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
 		}
 	}
 
-	--next_obstacle_frame;
-	if (next_obstacle_frame <= 0)
+	if(anim != FALL)
 	{
-		// throw in another obstacle
-		new_obstacle();
+		--next_obstacle_frame;
+		if (next_obstacle_frame <= 0)
+		{
+			// throw in another obstacle
+			new_obstacle();
+		}
 	}
 
 	
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
-		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, GROUND_HEIGHT + 32, /*priority*/0, /*palette*/0,
+		//set icone
+		int y = GROUND_HEIGHT + 32;
+		if(anim == FALL && obstacles[i].position <= 48)
+		{
+			y += actual_frame;
+			if(actual_frame == 8)
+			{
+				obstacles[i].active = false;
+			}
+		}
+
+		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, y, /*priority*/1, /*palette*/0,
 			SpriteSize_32x32/*?*/, SpriteColorFormat_256Color, oamGetGfxPtr(&oamSub, OBSTACLE_TILE + obstacles[i].type*OBSTACLE_TILE_COUNT),
 			-1, false, !obstacles[i].active, false, false, false);
 
-		//set icone
+		bool show = obstacles[i].active && (obstacles[i].can_change || obstacles[i].success);
 
-		oamSet( &oamSub, PLAYER_SPRITE + i, obstacles[i].position + 32, GROUND_HEIGHT + 32, 0, 1, SpriteSize_32x16, SpriteColorFormat_16Color, 
-			oamGetGfxPtr(&oamMain, ICONE_TILE + (int)obstacles[i].iconeType * 8), 0, false,  !obstacles[i].active, true, false, false);
+		oamSet( &oamSub, ICONE_SPRITE + i, obstacles[i].position - 16, y, 0, obstacles[i].success?2:1, SpriteSize_32x16, SpriteColorFormat_16Color, 
+			oamGetGfxPtr(&oamMain, ICONE_TILE + (int)obstacles[i].iconeType * 8), 0, false,  !show, true, false, false);
 	}
 
 	int y = GROUND_HEIGHT;
@@ -257,16 +276,19 @@ void GameHub::new_obstacle()
 {
 	unsigned char type = obstacles[current_obstacle].type + 1;
 
+	obstacles[current_obstacle].can_change = false;
+
 	++current_obstacle;
 	if (current_obstacle >= NUM_OBSTACLE)
 	{
 		current_obstacle = 0;
 	}
 
-	obstacles[current_obstacle].type = type == OBSTACLE_COUNT ? (ObstacleType)0 : (ObstacleType)type; // todo : RNG
+	obstacles[current_obstacle].type = type == OBSTACLE_COUNT ? 0 : type; // todo : RNG
 	obstacles[current_obstacle].position = 256;
 	obstacles[current_obstacle].success = false;
 	obstacles[current_obstacle].active = true;
+	obstacles[current_obstacle].can_change = true;
 
 	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
 

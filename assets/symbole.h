@@ -4,11 +4,11 @@
 //======================================================================
 //
 //	symbole, 256x16@4, 
-//	+ palette 16 entries, not compressed
+//	+ palette 32 entries, not compressed
 //	+ 64 tiles Metatiled by 4x2 not compressed
-//	Total size: 32 + 2048 = 2080
+//	Total size: 64 + 2048 = 2112
 //
-//	Time-stamp: 2013-07-13, 21:37:01
+//	Time-stamp: 2013-07-14, 13:47:16
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -20,8 +20,8 @@
 #define symboleTilesLen 2048
 extern const unsigned char symboleTiles[2048];
 
-#define symbolePalLen 32
-extern const unsigned char symbolePal[32];
+#define symbolePalLen 64
+extern const unsigned char symbolePal[64];
 
 #endif // GRIT_SYMBOLE_H
 

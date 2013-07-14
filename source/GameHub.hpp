@@ -35,6 +35,7 @@ class GameHub : public Game
 			unsigned char type;
 			bool success;
 			bool active;
+			bool can_change;//this is set to false if it's not posible to avoid the obstacle now.
 			ObstacleType iconeType;
 		};
 		
