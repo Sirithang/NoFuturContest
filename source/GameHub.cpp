@@ -78,7 +78,9 @@ void GameHub::init()
 
 
 	// init the gameplay variables
-	player_life = 100;
+	state = PLAYING;
+	player_life = 5;
+	remaining_obstacles = 20;
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
@@ -98,6 +100,10 @@ void GameHub::init()
 
 	// set as current
 	Game::current = this;
+
+	current_level = 0;
+	current_level_obstacle_count = 0;
+	speed = 1;
 }
 
 void GameHub::resume()
@@ -156,15 +162,25 @@ void GameHub::update_top()
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
 		if(anim != FALL)
-			--obstacles[i].position;
+			obstacles[i].position -= speed;
 		
+		const int positionJump[3] = {48, 46, 46};
+
 		if (obstacles[i].position < -32)
 		{
 			obstacles[i].active = false;
 		}
-		else if (obstacles[i].position == 48)
+		else if (obstacles[i].position == positionJump[current_level])
 		{
-			anim = obstacles[i].success ? FALL : JUMP;
+			if (obstacles[i].success)
+			{
+				--player_life;
+				anim = FALL;
+			}
+			else
+			{
+				anim = JUMP;
+			}
 			actual_frame = 0;
 			--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
 		}
@@ -175,6 +191,21 @@ void GameHub::update_top()
 		--next_obstacle_frame;
 		if (next_obstacle_frame <= 0)
 		{
+			if(current_level < 2)
+			{
+				const int nbObstaclePerLevel[3] = {4,6,9};
+				const int speeds[3] = {1, 2,2};
+
+				current_level_obstacle_count++;
+
+				if(current_level_obstacle_count == nbObstaclePerLevel[current_level])
+				{
+					current_level++;
+					current_level_obstacle_count = 0;
+					speed = speeds[current_level];
+				}
+			}
+
 			// throw in another obstacle
 			new_obstacle();
 		}
@@ -208,7 +239,7 @@ void GameHub::update_top()
 	if (anim == JUMP)
 	{
 		// do not factorise ! we don't want to lose precision, so divisions MUST come last
-		y -= (actual_frame*JUMP_HEIGHT - actual_frame*actual_frame*JUMP_HEIGHT/64)/16;
+		y -= (actual_frame*JUMP_HEIGHT - actual_frame*actual_frame*JUMP_HEIGHT/64)/(16*speed);
 	}
 
 	// player
@@ -216,6 +247,14 @@ void GameHub::update_top()
 		SpriteSize_64x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamSub, playerObj.tile),
 		-1, false, false, false, false, false);
 
+	if (player_life <= 0)
+	{
+		state = WIN;
+	}
+	if (remaining_obstacles <= 0 && obstacles[current_obstacle].active == false)
+	{
+		state = LOSE;
+	}
 }
 
 void GameHub::draw_top()
@@ -249,7 +288,7 @@ void GameHub::draw_top()
 			else
 			{
 				dmaCopy(zorro_jumpTiles + PLAYER_TILE_SIZE*player_frame, oamGetGfxPtr(&oamSub, PLAYER_TILE), PLAYER_TILE_SIZE);
-				if(player_frame == 0) mmEffect( SFX_JUMP );
+				//if(player_frame == 0) mmEffect( SFX_JUMP );
 			}
 		}
 		else // FALL
@@ -276,20 +315,26 @@ void GameHub::draw_top()
 
 void GameHub::new_obstacle()
 {
-	++current_obstacle;
-	if (current_obstacle >= NUM_OBSTACLE)
+	if (remaining_obstacles > 0)
 	{
-		current_obstacle = 0;
+		--remaining_obstacles;
+
+		++current_obstacle;
+		if (current_obstacle >= NUM_OBSTACLE)
+		{
+			current_obstacle = 0;
+		}
+
+		obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
+		obstacles[current_obstacle].position = 256;
+		obstacles[current_obstacle].success = false;
+		obstacles[current_obstacle].active = true;
+
+		obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
+
+		const int nbFrames[3]= {150, 90, 60};
+		next_obstacle_frame = nbFrames[current_level];
 	}
-
-	obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
-	obstacles[current_obstacle].position = 256;
-	obstacles[current_obstacle].success = false;
-	obstacles[current_obstacle].active = true;
-
-	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
-
-	next_obstacle_frame = 150;
 }
 
 void GameHub::minigame_success()

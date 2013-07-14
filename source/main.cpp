@@ -9,6 +9,11 @@
 #include "../assets/titre_bas.h"
 #include "../assets/touche_pour_commencer.h"
 
+#include "../assets/win.h"
+#include "../assets/win_haut.h"
+#include "../assets/lose.h"
+#include "../assets/loser_haut.h"
+
 #include "../assets/soundbank.h"
 #include "../assets/soundbank_bin.h"  // Soundbank definitions
 
@@ -104,7 +109,7 @@ int main()
 		unsigned int frame_number = 0;
 
 		// game loop
-		while (true)
+		while (GameHub::hub.state == GameHub::PLAYING)
 		{
 			scanKeys();
 	
@@ -134,13 +139,46 @@ int main()
 			++frame_number;
 		}
 
+		bgHide(gUsine.bg);
+		bgHide(gUsine.bg2);
+
 		// setup score screen
+		oamDisable(&oamMain);
+		oamDisable(&oamSub);
 		
+		if (GameHub::hub.state == GameHub::WIN)
+		{
+			bg1 = bgInitSub(3, BgType_Text4bpp, BgSize_T_256x256, 0, 1);
+			dmaCopy(win_hautTiles, bgGetGfxPtr(bg1), sizeof(win_hautTiles));
+			dmaCopy(win_hautMap, bgGetMapPtr(bg1), sizeof(win_hautMap));
+			dmaCopy(win_hautPal, BG_PALETTE_SUB, sizeof(win_hautPal));
+		
+			bg2 = bgInit(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+			dmaCopy(winTiles, bgGetGfxPtr(bg2), sizeof(winTiles));
+			dmaCopy(winMap, bgGetMapPtr(bg2), sizeof(winMap));
+			dmaCopy(winPal, BG_PALETTE, sizeof(winPal));
+		}
+		else
+		{
+			bg1 = bgInitSub(3, BgType_Text4bpp, BgSize_T_256x256, 0, 1);
+			dmaCopy(loser_hautTiles, bgGetGfxPtr(bg1), sizeof(loser_hautTiles));
+			dmaCopy(loser_hautMap, bgGetMapPtr(bg1), sizeof(loser_hautMap));
+			dmaCopy(loser_hautPal, BG_PALETTE_SUB, sizeof(loser_hautPal));
+		
+			bg2 = bgInit(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+			dmaCopy(loseTiles, bgGetGfxPtr(bg2), sizeof(loseTiles));
+			dmaCopy(loseMap, bgGetMapPtr(bg2), sizeof(loseMap));
+			dmaCopy(losePal, BG_PALETTE, sizeof(losePal));
+		}
+
 		// score screen loop
 		do
 		{
 			swiWaitForVBlank();
 			scanKeys();
 		} while (!(keysDown() & (KEY_START | KEY_TOUCH)));
+
+		bgHide(bg1);
+		bgHide(bg2);
 	}
 }

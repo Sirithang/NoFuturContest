@@ -140,6 +140,9 @@ void Game::update()
 
 void Game::start_game(int game)
 {
+	bgHide(gUsine.bg);
+	bgHide(gUsine.bg2);
+
 	current = games[game];
 	current->init();
 

@@ -6,10 +6,21 @@
 
 #define NUM_OBSTACLE 5
 
+extern UsineMap gUsine;
+
 class GameHub : public Game
 {
 	public:
+		enum State
+		{
+			PLAYING,
+			WIN,
+			LOSE,
+		};
+
+		State state;
 		unsigned short player_life;
+		unsigned short remaining_obstacles;
 
 		virtual void init();
 		void resume();
@@ -28,6 +39,10 @@ class GameHub : public Game
 		~GameHub() {}
 
 		unsigned char frame_counter;
+
+		u8 current_level;
+		u8 current_level_obstacle_count;
+		u8 speed; // over 16 to get the actual speed
 
 		struct Obstacle
 		{

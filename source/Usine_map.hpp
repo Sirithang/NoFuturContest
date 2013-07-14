@@ -9,7 +9,7 @@
 #define NUMBER_MACHINES 12
 
 #define ICONE_SPRITESHEET 0
-#define SPRITESHEET_WORK ((32*8)) //32 x nbFrame of SLeep
+#define SPRITESHEET_WORK ((16*8))
 
 #define ICONE_PALETTE 0
 #define WORKER_PALETTE 1
@@ -34,11 +34,14 @@ struct Machine
 	int workerFrameCounter;
 	int workerFrame;
 	int workerPal;
+
+	int machinePal;
 };
 
 struct UsineMap
 {
 	int bg;
+	int bg2;
 	int w,h;
 	u16 map[(SCREEN_WIDTH/USINE_CASE_T) * (SCREEN_HEIGHT/USINE_CASE_T)];
 
