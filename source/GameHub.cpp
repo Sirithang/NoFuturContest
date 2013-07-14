@@ -5,6 +5,9 @@
 #include "../assets/obstacle.h"
 #include "../assets/symbole.h"
 
+#include "../assets/background_haut_l.h"
+#include "../assets/background_haut_r.h"
+
 #include "GameHub.hpp"
 #include "Objet.hpp"
 #include "Usine_map.hpp"
@@ -39,6 +42,7 @@ GameHub GameHub::hub;
 Object playerObj;
 
 UsineMap gUsine;
+int bg;
 
 void GameHub::init()
 {
@@ -50,6 +54,15 @@ void GameHub::init()
 
 	// setup background
 	BG_PALETTE_SUB[0] = 0;
+
+	int bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_512x256, 0, 1);
+	dmaCopy(background_haut_lTiles, bgGetGfxPtr(bg), sizeof(background_haut_lTiles));
+	dmaCopy(background_haut_lMap, bgGetMapPtr(bg), sizeof(background_haut_lMap));
+
+	dmaCopy(background_haut_rTiles, bgGetGfxPtr(bg)+ sizeof(background_haut_lTiles)/sizeof(u16), sizeof(background_haut_rTiles));
+	dmaCopy(background_haut_rMap, bgGetMapPtr(bg) + sizeof(background_haut_lMap)/sizeof(u16), sizeof(background_haut_rMap));
+
+	dmaCopy(background_haut_lPal, BG_PALETTE_SUB, sizeof(background_haut_lPal));
 
 	// init oam
 	oamClear(&oamSub, 0, 0);
@@ -184,7 +197,7 @@ void GameHub::update_top()
 			if(current_level < 2)
 			{
 				const int nbObstaclePerLevel[3] = {4,6,9};
-				const int speed[3] = {1, 2,2};
+				const int speed_lev[3] = {1, 2,2};
 
 				current_level_obstacle_count++;
 
@@ -192,13 +205,16 @@ void GameHub::update_top()
 				{
 					current_level++;
 					current_level_obstacle_count = 0;
-					speed = speed[current_level];
+					speed = speed_lev[current_level];
 				}
 			}
 
 			// throw in another obstacle
 			new_obstacle();
 		}
+
+		bgScroll(bg, -1, 0);
+		bgUpdate();
 	}
 
 	
@@ -215,7 +231,7 @@ void GameHub::update_top()
 			}
 		}
 
-		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, y, /*priority*/1, /*palette*/0,
+		oamSet(	&oamSub, OBSTACLE_SPRITE + i, obstacles[i].position, y, /*priority*/0, /*palette*/0,
 			SpriteSize_32x32/*?*/, SpriteColorFormat_256Color, oamGetGfxPtr(&oamSub, OBSTACLE_TILE + obstacles[i].type*OBSTACLE_TILE_COUNT),
 			-1, false, !obstacles[i].active, false, false, false);
 
