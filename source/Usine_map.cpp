@@ -104,6 +104,7 @@ void usine::init(UsineMap& obj)
 			obj._machines[idx].workerFramesCount = framesNb[anim];
 			obj._machines[idx].workerFrameCounter = 0;
 			obj._machines[idx].workerFrame = rand()%framesNb[anim];
+			obj._machines[idx].workerPal = rand()%4; 
 		}
 	}
 }
@@ -152,8 +153,13 @@ void usine::restoreSprite(UsineMap& obj)
 	dmaCopy(workTiles, oamGetGfxPtr(&oamMain, SPRITESHEET_WORK), sizeof(workTiles));
 
 	//dmaCopy(symbolePal, SPRITE_PALETTE, sizeof(symbolePal));
-	dmaCopy(workPal, SPRITE_PALETTE, sizeof(workPal));
-	dmaCopy(symbolePal, SPRITE_PALETTE + 16, sizeof(symbolePal));
+	dmaCopy(workPal, SPRITE_PALETTE, 32);
+	dmaCopy(workPal + 32, SPRITE_PALETTE + 16, 32);
+	dmaCopy(workPal + 64, SPRITE_PALETTE + 32, 32);
+	dmaCopy(workPal + 96, SPRITE_PALETTE + 48, 32);
+
+	dmaCopy(symbolePal, SPRITE_PALETTE + 64, sizeof(symbolePal));
+	
 }
 
 void usine::update(UsineMap& obj)
@@ -188,11 +194,11 @@ void usine::update(UsineMap& obj)
 			mach.workerFrame = mach.workerFrame < mach.workerFramesCount ? mach.workerFrame + 1 : 0;
 		}
 
-		oamSet(	&oamMain, mach.workerSprite, /*x*/mach.x+16, /*y*/mach.y+32, /*priority*/0, /*palette*/0,
+		oamSet(	&oamMain, mach.workerSprite, /*x*/mach.x+16, /*y*/mach.y+32, /*priority*/0, /*palette*/mach.workerPal,
 			SpriteSize_32x32, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, mach.workerSpritesheetOffset+ 16*mach.workerFrame),
 		0, false, false, false, false, false);
 
-		oamSet( &oamMain, mach.iconeSprite, mach.x, mach.y, 0, 1, SpriteSize_32x16, SpriteColorFormat_16Color, 
+		oamSet( &oamMain, mach.iconeSprite, mach.x, mach.y, 0, 4, SpriteSize_32x16, SpriteColorFormat_16Color, 
 			oamGetGfxPtr(&oamMain, (int)mach.obstacle * 8), 0, false, !mach.usable, false, false, false);
 
 		obj._machines[i] = mach;

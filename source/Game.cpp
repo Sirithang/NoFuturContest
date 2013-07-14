@@ -63,10 +63,33 @@ void Game::init()
 	
 	consoleSetFont(console, &font);
 	
+	finished = 0;
+	frameSinceFinished = 0;
 }
 
 void Game::update()
 {
+	if(finished)
+	{
+		frameSinceFinished--;
+
+		if(frameSinceFinished == 0)
+		{
+			timerStop(0);
+			if (success)
+			{
+				GameHub::hub.minigame_success();
+			}
+			GameHub::hub.resume();
+			current = &GameHub::hub;
+
+			mmSetModuleVolume( 512 );	// = 1/4
+			mmEffectCancel(sfxhandle_hurry_up);
+		}
+
+		return;
+	}
+
 	if (timer_remaining_total_frame == 0)
 	{
 		game_end(false);
@@ -125,17 +148,16 @@ void Game::start_game(int game)
 
 void Game::game_end(bool success)
 {
+	current->success = success;
+	current->finished = 1;
+	current->frameSinceFinished = 30;
+
 	timerStop(0);
-	if (success)
-	{
-		GameHub::hub.minigame_success();
-	}
-	GameHub::hub.resume();
 
-	current = &GameHub::hub;
-
-	mmSetModuleVolume( 512 );	// = 1/4
-	mmEffectCancel(sfxhandle_hurry_up);
+	if(success)
+		current->writeTimed(current->winSentence, 500);
+	else
+		current->writeTimed(current->looseSentence, 500);
 }
 
 bool Game::is_game_playing()
@@ -160,6 +182,9 @@ void timerCallBack()
 
 void Game::writeTimed(const char* message, int milliSeconds)
 {
+	consoleClear();
+	timerStop(0);
+
 	currentNbCalls = 0;
 	nbCallNeeded = milliSeconds;
 

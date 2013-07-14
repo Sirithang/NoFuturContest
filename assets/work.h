@@ -3,12 +3,12 @@
 
 //======================================================================
 //
-//	work, 384x160@4, 
-//	+ palette 16 entries, not compressed
-//	+ 960 tiles Metatiled by 4x4 not compressed
-//	Total size: 32 + 30720 = 30752
+//	work, 384x192@4, 
+//	+ palette 64 entries, not compressed
+//	+ 1152 tiles Metatiled by 4x4 not compressed
+//	Total size: 128 + 36864 = 36992
 //
-//	Time-stamp: 2013-07-13, 21:13:21
+//	Time-stamp: 2013-07-14, 16:00:39
 //	Exported by Cearn's GBA Image Transmogrifier, v0.8.3
 //	( http://www.coranac.com/projects/#grit )
 //
@@ -17,11 +17,11 @@
 #ifndef GRIT_WORK_H
 #define GRIT_WORK_H
 
-#define workTilesLen 30720
-extern const unsigned char workTiles[30720];
+#define workTilesLen 36864
+extern const unsigned char workTiles[36864];
 
-#define workPalLen 32
-extern const unsigned char workPal[32];
+#define workPalLen 128
+extern const unsigned char workPal[128];
 
 #endif // GRIT_WORK_H
 

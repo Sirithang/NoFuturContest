@@ -33,6 +33,7 @@ struct Machine
 	int workerFramesCount;
 	int workerFrameCounter;
 	int workerFrame;
+	int workerPal;
 };
 
 struct UsineMap
