@@ -9,6 +9,7 @@
 #include "Usine_map.hpp"
 
 #include <nds.h>
+#include <math.h>
 
 GameHub GameHub::hub;
 
@@ -119,7 +120,7 @@ void GameHub::update()
 		if(gUsine.map[usineCase.x + usineCase.y * gUsine.w] != 0)
 		{
 			minigame_obstacle = current_obstacle;
-			Game::start_game(2/*obstacles[minigame_obstacle].type % 2*/);
+			Game::start_game(obstacles[minigame_obstacle].type);
 		}
 	}
 
@@ -231,15 +232,13 @@ void GameHub::draw_top()
 
 void GameHub::new_obstacle()
 {
-	unsigned char type = obstacles[current_obstacle].type + 1;
-
 	++current_obstacle;
 	if (current_obstacle >= NUM_OBSTACLE)
 	{
 		current_obstacle = 0;
 	}
 
-	obstacles[current_obstacle].type = type == OBSTACLE_COUNT ? 0 : type; // todo : RNG
+	obstacles[current_obstacle].type = mod32(rand(), Game::game_count);
 	obstacles[current_obstacle].position = 256;
 	obstacles[current_obstacle].success = false;
 	obstacles[current_obstacle].active = true;

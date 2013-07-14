@@ -14,6 +14,9 @@ class Capitalist : public Game
 
 	private:
 		Capitalist() {}
+
+		unsigned char frame;
+		unsigned char anim;
 };
 
 #endif
