@@ -103,12 +103,16 @@ void GameHub::init()
 
 	// init the gameplay variables
 	player_life = 0;
+	state = PLAYING;
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
 		obstacles[i].active = false;
 	}
 
+	current_level = 0;
+	current_level_obstacle_count = 0;
+	speed = 1;
 	current_obstacle = 0;
 	new_obstacle();
 
@@ -122,10 +126,6 @@ void GameHub::init()
 
 	// set as current
 	Game::current = this;
-
-	current_level = 0;
-	current_level_obstacle_count = 0;
-	speed = 1;
 
 	nextBgScroll = 0;
 }
@@ -185,32 +185,37 @@ void GameHub::update_top()
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
-		if(anim != FALL)
-			obstacles[i].position -= speed;
-		
-		const int positionJump[3] = {48, 46, 46};
-
-		if (obstacles[i].position < -32)
+		if (obstacles[i].active)
 		{
-			obstacles[i].active = false;
-		}
-		else if (obstacles[i].position == positionJump[current_level])
-		{
-			anim = obstacles[i].success ? FALL : JUMP;
-			actual_frame = 0;
-			--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
-
-			if(!Game::is_game_playing())
+			if(anim != FALL)
 			{
-				if(anim == FALL)
+				obstacles[i].position -= speed;
+			}
+
+			const int positionJump[3] = {48, 46, 46};
+
+			if (obstacles[i].position < -32)
+			{
+				obstacles[i].active = false;
+			}
+			else if (obstacles[i].position == positionJump[current_level])
+			{
+				anim = obstacles[i].success ? FALL : JUMP;
+				actual_frame = 0;
+				--obstacles[i].position;//to avoid infinite loop because obstacle is stuck at 48 when falling
+
+				if(!Game::is_game_playing())
 				{
-					if(player_life < 10)
-						player_life += 1;
-				}
-				else
-				{
-					if(player_life > 0)
-						player_life -= 1;
+					if(anim == FALL)
+					{
+						if(player_life < 10)
+							player_life += 1;
+					}
+					else
+					{
+						if(player_life > 0)
+							player_life -= 1;
+					}
 				}
 			}
 		}
