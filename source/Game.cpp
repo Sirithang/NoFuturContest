@@ -31,6 +31,11 @@ void Game::init_timer(unsigned char sec, unsigned char frame)
 
 void Game::init()
 {
+	bgHide(0);
+	bgHide(1);
+	bgHide(2);
+	bgHide(3);
+
 	dmaCopy(barTiles, oamGetGfxPtr(&oamMain, BAR_TILE), sizeof(barTiles));
 	dmaCopy(barPal, SPRITE_PALETTE + 240, sizeof(barPal));
 

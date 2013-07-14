@@ -136,7 +136,7 @@ void usine::restoreGraphics(UsineMap& obj)
 
 	int bg2 = bgInit(1, BgType_Text4bpp, BgSize_T_256x256, 1, 2);
 	dmaCopy(background_usineTiles, bgGetGfxPtr(bg2), background_usineTilesLen);
-	dmaCopy(background_usinePal+96, BG_PALETTE+48, 32);
+	dmaCopy(background_usinePal, BG_PALETTE+48, 32);
 
 	u16* mapPtr = bgGetMapPtr(obj.bg);
 	u16* map2Ptr = bgGetMapPtr(bg2);
@@ -153,9 +153,9 @@ void usine::restoreGraphics(UsineMap& obj)
 			u8 x = i / (USINE_CASE_T/8);
 			u8 y = j / (USINE_CASE_T/8);
 
-			mapPtr[idx] = ((obj.map[x + y*obj.w]) * (USINE_CASE_T/8*8)) + ((i%(USINE_CASE_T/8)) + (j%(USINE_CASE_T/8))*(USINE_CASE_T/8)) | TILE_PALETTE(obj._machines[x + y*obj.w].machinePal);
+			mapPtr[idx] = (((obj.map[x + y*obj.w]) * (USINE_CASE_T/8*8)) + ((i%(USINE_CASE_T/8)) + (j%(USINE_CASE_T/8))*(USINE_CASE_T/8))) | TILE_PALETTE(obj._machines[x + y*obj.w].machinePal);
 
-			map2Ptr[idx] = idx | TILE_PALETTE(2);
+			map2Ptr[idx] = idx | TILE_PALETTE(3);
 		}
 	}
 }
