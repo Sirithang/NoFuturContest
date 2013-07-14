@@ -130,9 +130,9 @@ void GameHub::update()
 
 		Vec2i usineCase = usine::getCase(gUsine, position);
 		int idx = usineCase.x + usineCase.y * gUsine.w;
-		if(gUsine._machines[idx].obstacle == obstacles[current_obstacle].iconeType)
+		if(gUsine._machines[idx].obstacle == obstacles[current_obstacle].iconeType && gUsine._machines[idx].usable)
 		{
-			gUsine._machines[idx].workerSpritesheetOffset = SPRITESHEET_WORK;
+			machine::startWork(gUsine._machines[idx]);
 
 			minigame_obstacle = current_obstacle;
 			Game::start_game(1);
@@ -198,7 +198,7 @@ void GameHub::update_top()
 
 		bool show = obstacles[i].active && (obstacles[i].can_change || obstacles[i].success);
 
-		oamSet( &oamSub, ICONE_SPRITE + i, obstacles[i].position - 16, y, 0, obstacles[i].success?2:1, SpriteSize_32x16, SpriteColorFormat_16Color, 
+		oamSet( &oamSub, ICONE_SPRITE + i, obstacles[i].position - 16, y - 16, 0, obstacles[i].success?2:1, SpriteSize_32x16, SpriteColorFormat_16Color, 
 			oamGetGfxPtr(&oamMain, ICONE_TILE + (int)obstacles[i].iconeType * 8), 0, false,  !show, true, false, false);
 	}
 

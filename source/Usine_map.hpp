@@ -19,6 +19,9 @@ enum ObstacleType { SQUARE, LOSANGE, TRIANGLE, ARROW, DASH, M, CIRCLE, HEART, MA
 
 struct Machine
 {
+	u8	usable;
+	u16 frameUntilUsable;
+
 	int x;
 	int y;
 	int type;
@@ -27,6 +30,7 @@ struct Machine
 
 	int workerSprite;
 	int workerSpritesheetOffset;
+	int workerFramesCount;
 	int workerFrameCounter;
 	int workerFrame;
 };
