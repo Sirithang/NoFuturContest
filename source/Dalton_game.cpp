@@ -4,7 +4,7 @@
 #include "../assets/bar.h"
 
 #define DALTON_SPRITE (BAR_SPRITE + BAR_SPRITE_COUNT)
-#define DALTON_TILE (BAR_TILE + BAR_TILE_COUNT*BAR_LENGTH)
+#define DALTON_TILE (BAR_TILE + BAR_TILE_COUNT*5)
 #define DALTON_TILE_COUNT (4*8)
 #define DALTON_TILE_SIZE (DALTON_TILE_COUNT*32)
 
@@ -42,11 +42,6 @@ void Dalton::init()
 			SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
 			-1, false, false, false, false, false);
 	}
-
-	//bgHide(0);
-	//bgHide(1);
-	//bgHide(2);
-	//bgHide(3);
 
 	Game::init();
 

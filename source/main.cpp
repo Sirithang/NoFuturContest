@@ -4,12 +4,18 @@
 #include "GameHub.hpp"
 
 #include <maxmod9.h>    // Maxmod definitions for ARM9
+
+#include "../assets/ecran_titre.h"
 #include "../assets/soundbank.h"
 #include "../assets/soundbank_bin.h"  // Soundbank definitions
 
 int main()
 {
 	lcdMainOnBottom();
+
+	// setup game
+	videoSetMode(MODE_0_2D);
+	videoSetModeSub(MODE_0_2D);
 
 	vramSetBankA(VRAM_A_MAIN_BG);
 	vramSetBankB(VRAM_B_MAIN_SPRITE);
@@ -20,10 +26,14 @@ int main()
     	mmInitDefaultMem( (mm_addr)soundbank_bin );
 	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT );
 	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU_LIGHT, MM_PLAY_LOOP );
-		
+	
 	while (true)
 	{
 		// setup title screen
+		int bg = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
+		dmaCopy(ecran_titreTiles, bgGetGfxPtr(bg), sizeof(ecran_titreTiles));
+		dmaCopy(ecran_titreMap, bgGetMapPtr(bg), sizeof(ecran_titreMap));
+		dmaCopy(ecran_titrePal, BG_PALETTE_SUB, sizeof(ecran_titrePal));
 
 		unsigned int time = 0;
 
@@ -35,11 +45,9 @@ int main()
 			scanKeys();
 		} while (!(keysDown() & (KEY_START | KEY_TOUCH)));
 
-		srand(time);
+		bgHide(bg);
 
-		// setup game
-		videoSetMode(MODE_0_2D);
-		videoSetModeSub(MODE_0_2D);
+		srand(time);
 
 		// initialize the hub, set it at the current screen
 		GameHub::hub.GameHub::init();

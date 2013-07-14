@@ -39,6 +39,7 @@ void GameHub::init()
 	// *******************
 
 	// setup background
+	BG_PALETTE_SUB[0] = 0;
 
 	// init oam
 	oamClear(&oamSub, 0, 0);
@@ -118,7 +119,7 @@ void GameHub::update()
 		if(gUsine.map[usineCase.x + usineCase.y * gUsine.w] != 0)
 		{
 			minigame_obstacle = current_obstacle;
-			Game::start_game(1);
+			Game::start_game(2/*obstacles[minigame_obstacle].type % 2*/);
 		}
 	}
 

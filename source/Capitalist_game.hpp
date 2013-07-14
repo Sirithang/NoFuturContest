@@ -14,10 +14,6 @@ class Capitalist : public Game
 
 	private:
 		Capitalist() {}
-
-		// sprite's topleft position
-		int capitalist_x;
-		int capitalist_y;
 };
 
 #endif

@@ -5,6 +5,7 @@
 #include "GameHub.hpp"
 #include "Capitalist_game.hpp"
 #include "Dalton_game.hpp"
+#include "Aim_game.hpp"
 #include "../assets/bar.h"
 #include "../assets/font.h"
 
@@ -12,7 +13,7 @@
 #define BAR_Y 10
 
 Game* Game::current;
-Game* const Game::games[] = { &Capitalist::capitalist, &Dalton::dalton };
+Game* const Game::games[] = { &Capitalist::capitalist, &Dalton::dalton, &Aim::aim };
 const int Game::game_count = sizeof(Game::games)/sizeof(Game*);
 
 void Game::init_timer(unsigned char sec, unsigned char frame)
