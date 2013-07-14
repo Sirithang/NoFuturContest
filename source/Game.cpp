@@ -161,9 +161,15 @@ void Game::game_end(bool success)
 	timerStop(0);
 
 	if(success)
+	{
 		current->writeTimed(current->winSentence, 500);
+		mmJingle( MOD_JINGLE_WIN );
+	}
 	else
+	{
 		current->writeTimed(current->looseSentence, 500);
+		mmJingle( MOD_JINGLE_LOSE );
+	}
 }
 
 bool Game::is_game_playing()

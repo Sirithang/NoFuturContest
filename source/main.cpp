@@ -32,6 +32,10 @@ int main()
 	mmLoadEffect( SFX_STEP_RIGHT );
 	mmLoadEffect( SFX_TOUCH );
 
+	// JINGLES
+	mmLoad( MOD_JINGLE_WIN );
+	mmLoad( MOD_JINGLE_LOSE );
+
 	// MUSIC
 	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU );
 	mmSetModuleVolume( 512 );	// = 1/2
