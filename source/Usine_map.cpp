@@ -1,6 +1,6 @@
 #include "Usine_map.hpp"
 #include "../assets/test_usine_tilesets.h"
-
+#include "../assets/background_usine.h"
 #include "../assets/symbole.h"
 #include "../assets/work.h"
 
@@ -104,7 +104,9 @@ void usine::init(UsineMap& obj)
 			obj._machines[idx].workerFramesCount = framesNb[anim];
 			obj._machines[idx].workerFrameCounter = 0;
 			obj._machines[idx].workerFrame = rand()%framesNb[anim];
-			obj._machines[idx].workerPal = rand()%4; 
+			obj._machines[idx].workerPal = rand()%4;
+
+			obj._machines[idx].machinePal = rand()%3;
 		}
 	}
 }
@@ -125,11 +127,22 @@ Vec2i usine::getCase(UsineMap& obj, touchPosition& position)
 
 void usine::restoreGraphics(UsineMap& obj)
 {
-	obj.bg = bgInit(0, BgType_Text8bpp, BgSize_T_256x256, 0,1);
+	obj.bg = bgInit(0, BgType_Text4bpp, BgSize_T_256x256, 0,1);
 	dmaCopy(test_usine_tilesetsTiles,bgGetGfxPtr(obj.bg), test_usine_tilesetsTilesLen);
-	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, sizeof(test_usine_tilesetsPal));
+
+	dmaCopy(test_usine_tilesetsPal, BG_PALETTE, 32);
+	dmaCopy(test_usine_tilesetsPal+32, BG_PALETTE+16, 32);
+	dmaCopy(test_usine_tilesetsPal+64, BG_PALETTE+32, 32);
+
+	int bg2 = bgInit(1, BgType_Text4bpp, BgSize_T_256x256, 1, 2);
+	dmaCopy(background_usineTiles, bgGetGfxPtr(bg2), background_usineTilesLen);
+	dmaCopy(background_usinePal+96, BG_PALETTE+48, 32);
 
 	u16* mapPtr = bgGetMapPtr(obj.bg);
+	u16* map2Ptr = bgGetMapPtr(bg2);
+
+	int lastX = 0;
+	int lastY = 0;
 
 	for(int i = 0; i < obj.w * (USINE_CASE_T/8); ++i)
 	{
@@ -140,7 +153,9 @@ void usine::restoreGraphics(UsineMap& obj)
 			u8 x = i / (USINE_CASE_T/8);
 			u8 y = j / (USINE_CASE_T/8);
 
-			mapPtr[idx] = bgGetMapBase(obj.bg)+ ((obj.map[x + y*obj.w]) * (USINE_CASE_T/8*8)) + ((i%(USINE_CASE_T/8)) + (j%(USINE_CASE_T/8))*(USINE_CASE_T/8));
+			mapPtr[idx] = ((obj.map[x + y*obj.w]) * (USINE_CASE_T/8*8)) + ((i%(USINE_CASE_T/8)) + (j%(USINE_CASE_T/8))*(USINE_CASE_T/8)) | TILE_PALETTE(obj._machines[x + y*obj.w].machinePal);
+
+			map2Ptr[idx] = idx | TILE_PALETTE(2);
 		}
 	}
 }
