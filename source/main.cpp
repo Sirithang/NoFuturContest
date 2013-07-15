@@ -14,6 +14,10 @@
 #include "../assets/lose.h"
 #include "../assets/loser_haut.h"
 
+#include "../assets/intro_1.h"
+#include "../assets/intro_2.h"
+#include "../assets/intro_3.h"
+
 #include "../assets/soundbank.h"
 #include "../assets/soundbank_bin.h"  // Soundbank definitions
 
@@ -113,9 +117,51 @@ int main()
 			scanKeys();
 		} while (!(keysDown() & (KEY_START | KEY_TOUCH)));
 
-		bgHide(bg1);
 		bgHide(bg2);
 		bgHide(bg3);
+
+		//----- Setting instruction
+
+		int bg0 =  bgInit(0, BgType_Text4bpp, BgSize_T_256x256, 0, 1);
+		dmaCopy(intro_1Tiles, bgGetGfxPtr(bg0), sizeof(intro_1Tiles));
+		dmaCopy(intro_1Map, bgGetMapPtr(bg0), sizeof(intro_1Map));
+		dmaCopy(intro_1Pal, BG_PALETTE, sizeof(intro_1Pal));
+
+		int frameTimer = 0;
+		do
+		{
+			swiWaitForVBlank();
+			++frameTimer;
+			scanKeys();
+		} while (!(keysDown() & (KEY_START | KEY_TOUCH)) || frameTimer < 30);
+
+		dmaCopy(intro_2Tiles, bgGetGfxPtr(bg0), sizeof(intro_2Tiles));
+		dmaCopy(intro_2Map, bgGetMapPtr(bg0), sizeof(intro_2Map));
+		dmaCopy(intro_2Pal, BG_PALETTE, sizeof(intro_2Pal));
+
+		frameTimer = 0;
+		do
+		{
+			swiWaitForVBlank();
+			++frameTimer;
+			scanKeys();
+		} while (!(keysDown() & (KEY_START | KEY_TOUCH)) || frameTimer < 30);
+
+		dmaCopy(intro_3Tiles, bgGetGfxPtr(bg0), sizeof(intro_3Tiles));
+		dmaCopy(intro_3Map, bgGetMapPtr(bg0), sizeof(intro_3Map));
+		dmaCopy(intro_3Pal, BG_PALETTE, sizeof(intro_3Pal));
+
+		frameTimer = 0;
+		do
+		{
+			swiWaitForVBlank();
+			++frameTimer;
+			scanKeys();
+		} while (!(keysDown() & (KEY_START | KEY_TOUCH)) || frameTimer < 30);
+
+		//------------------------
+
+		bgHide(bg1);
 
 		REG_BLDCNT = 0;
 
