@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Capitalist_game.cpp" />
+    <ClCompile Include="source\Couronne_game.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\GameHub.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -63,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Capitalist_game.hpp" />
+    <ClInclude Include="source\Couronne_game.hpp" />
     <ClInclude Include="source\Game.hpp" />
     <ClInclude Include="source\GameHub.hpp" />
     <ClInclude Include="source\globals.hpp" />

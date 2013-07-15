@@ -9,6 +9,7 @@
 #include "Aim_game.hpp"
 #include "Statue_game.hpp"
 #include "Goulag_game.hpp"
+#include "Couronne_game.hpp"
 
 #include "../assets/bar.h"
 #include "../assets/font.h"
@@ -21,7 +22,7 @@
 #define BAR_Y 10
 
 Game* Game::current;
-Game* const Game::games[] = { /*&Capitalist::capitalist, &Dalton::dalton, &Aim::aim, &Statue::statue,*/ &Goulag::goulag };
+Game* const Game::games[] = { /*&Capitalist::capitalist, &Dalton::dalton, &Aim::aim, &Statue::statue, &Couronne::couronne, */ &Goulag::goulag };
 const int Game::game_count = sizeof(Game::games)/sizeof(Game*);
 
 mm_sfxhand sfxhandle_hurry_up;
