@@ -32,7 +32,7 @@ void Statue::init()
 
 	Game::init();
 
-	writeTimed("\x1b[10;10HDétruis!", 1000);
+	writeTimed("\x1b[10;10HDetruis!", 1000);
 }
 
 void Statue::update()

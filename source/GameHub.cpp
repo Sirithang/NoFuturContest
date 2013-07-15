@@ -114,7 +114,8 @@ void GameHub::init()
 	current_level_obstacle_count = 0;
 	speed = 1;
 	current_obstacle = 0;
-	new_obstacle();
+	next_obstacle_frame = 60*2;
+	//new_obstacle();
 
 	// ********************
 	// init the main screen
@@ -192,7 +193,7 @@ void GameHub::update_top()
 				obstacles[i].position -= speed;
 			}
 
-			const int positionJump[3] = {48, 46, 46};
+			const int positionJump[7] = {48, 48, 48, 46, 46, 46, 46};
 
 			if (obstacles[i].position < -32)
 			{
@@ -226,21 +227,28 @@ void GameHub::update_top()
 		--next_obstacle_frame;
 		if (next_obstacle_frame <= 0)
 		{
-			const int nbObstaclePerLevel[3] = {4,6,9};
-			const int speed_lev[3] = {1,2,2};
-			const int tempo_lev[3] = {820,922,1024};
+			const int nbObstaclePerLevel[7] = {0, 4, 0, 6, 0, 9, 0};
+			const int speed_lev[7] = {1, 1, 2, 2, 2, 2, 2};
+			const int tempo_lev[7] = {820, 820, 992, 922, 1024, 1024, 1024};
+			const int nbFrames[7]= {60*5, 150, 5*60, 100, 5*60, 80, 5*60};
 
 			current_level_obstacle_count++;
 
-			if(current_level_obstacle_count == nbObstaclePerLevel[current_level])
+			if(current_level_obstacle_count >= nbObstaclePerLevel[current_level])
 			{
-				if(current_level < 2)
+				if(current_level < 6)
 				{
 					current_level++;
 					current_level_obstacle_count = 0;
 					speed = speed_lev[current_level];
-					mmSetModuleTempo( tempo_lev[current_level] );
-					mmPosition( 0 );
+
+					if(nbObstaclePerLevel[current_level] != 0)
+					{
+						mmSetModuleTempo( tempo_lev[current_level] );
+						mmPosition( 0 );
+					}
+
+					next_obstacle_frame = nbFrames[current_level];
 				}
 				else
 				{
@@ -255,7 +263,11 @@ void GameHub::update_top()
 				}
 			}
 
-			new_obstacle();
+			if( nbObstaclePerLevel[current_level] != 0)
+			{
+				new_obstacle();
+				next_obstacle_frame = nbFrames[current_level];
+			}
 		}
 
 		if(nextBgScroll == 0)
@@ -390,9 +402,6 @@ void GameHub::new_obstacle()
 	obstacles[current_obstacle].active = true;
 
 	obstacles[current_obstacle].iconeType = (ObstacleType)(rand()%MAX_OBSTACLE_TYPE);
-
-	const int nbFrames[3]= {150, 100, 80};
-	next_obstacle_frame = nbFrames[current_level];
 }
 
 void GameHub::minigame_success()
