@@ -16,7 +16,7 @@ Goulag Goulag::goulag;
 
 void Goulag::init()
 {
-	init_timer(13, 0);
+	init_timer(15, 0);
 	counter = 0;
 
 	bg = bgInit(3, BgType_Text4bpp, BgSize_T_256x256, 1,2);
