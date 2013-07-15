@@ -16,7 +16,7 @@ Capitalist Capitalist::capitalist;
 
 void Capitalist::init()
 {
-	init_timer(3, 0);
+	init_timer(2, 0);
 	counter = 0;
 
 	frame = 0;

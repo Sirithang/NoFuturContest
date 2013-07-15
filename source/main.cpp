@@ -117,10 +117,23 @@ int main()
 		{
 			scanKeys();
 	
-			bool update_top = !Game::is_game_playing() || (frame_number & 0x3) == 0;
+			bool update_top = false;
+			if (Game::is_game_playing())
+			{
+				++frame_number;
+				if (frame_number == 10)
+				{
+					update_top = true;
+				}
+			}
+			else
+			{
+				update_top = true;
+			}
 
 			if (update_top)
 			{
+				frame_number = 0;
 				// update the top screen
 				GameHub::hub.update_top();
 			}

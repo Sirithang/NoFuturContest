@@ -1,6 +1,6 @@
 #include <nds.h>
 #include "Dalton_game.hpp"
-#include "../assets/buildings.h"
+#include "../assets/matriochka.h"
 #include "../assets/bar.h"
 
 #include <maxmod9.h>    // Maxmod definitions for ARM9
@@ -23,8 +23,8 @@ void Dalton::init()
 	oamEnable(&oamMain);
 	oamInit(&oamMain, SpriteMapping_1D_32, false);
 
-	dmaCopy(buildingsTiles, oamGetGfxPtr(&oamMain, DALTON_TILE), sizeof(buildingsTiles));
-	dmaCopy(buildingsPal, SPRITE_PALETTE, sizeof(buildingsPal));
+	dmaCopy(matriochkaTiles, oamGetGfxPtr(&oamMain, DALTON_TILE), sizeof(matriochkaTiles));
+	dmaCopy(matriochkaPal, SPRITE_PALETTE, sizeof(matriochkaPal));
 	
 	positions[0] = rand() & 0x3;
 	do
@@ -67,6 +67,8 @@ void Dalton::update()
 			if (	touch.px >= 64 + 32*positions[counter] && touch.px <= 64 + 32*(positions[counter] + 1) &&
 				touch.py >= 64 && touch.py <= 128)
 			{
+				(oamMain.oamMemory + DALTON_SPRITE + positions[counter])->palette = 1;
+
 				++counter;
 
 				mmEffect( SFX_TOUCH );
@@ -76,19 +78,6 @@ void Dalton::update()
 					game_end(true);
 				}
 			}
-		}
-	
-		for (unsigned int i = 0; i < counter; ++i)
-		{
-			oamSet(	&oamMain, DALTON_SPRITE + positions[i], 64 + 32*positions[i], 64, /*priority*/1, /*palette*/1,
-				SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
-				-1, false, false, false, false, false);
-		}
-		for (unsigned int i = counter; i < 4; ++i)
-		{
-			oamSet(	&oamMain, DALTON_SPRITE + positions[i], 64 + 32*positions[i], 64, /*priority*/1, /*palette*/0,
-				SpriteSize_32x64, SpriteColorFormat_16Color, oamGetGfxPtr(&oamMain, DALTON_TILE + i*DALTON_TILE_COUNT),
-				-1, false, false, false, false, false);
 		}
 	}
 }
