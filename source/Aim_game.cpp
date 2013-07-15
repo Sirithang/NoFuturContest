@@ -76,7 +76,7 @@ void Aim::init()
 
 	Game::init();
 
-	writeTimed("\x1b[10;10HCamoufle le capitaliste!", 1000);
+	writeTimed("\x1b[5;15HCamoufle le capitaliste!", 1000);
 }
 
 void Aim::update()

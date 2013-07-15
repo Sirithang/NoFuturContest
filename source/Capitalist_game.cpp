@@ -37,6 +37,8 @@ void Capitalist::init()
 	Game::init();
 
 	writeTimed("\x1b[10;10HTabasse!", 1000);
+
+	bgHide(1);
 }
 
 void Capitalist::update()
