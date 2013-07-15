@@ -63,7 +63,9 @@ void usine::init(UsineMap& obj)
 
 	int obstacleSpawned[MAX_OBSTACLE_TYPE];
 	for(int i = 0; i < MAX_OBSTACLE_TYPE; ++i)
-		obstacleSpawned[i] = 0;
+		obstacleSpawned[i] = i;
+
+	int sizeList = MAX_OBSTACLE_TYPE;
 
 	for(int i = 0; i < obj.w; ++i)
 	{
@@ -80,19 +82,41 @@ void usine::init(UsineMap& obj)
 			obj._machines[idx].y = y * USINE_CASE_T;
 			obj._machines[idx].type = type;
 
-			int obstRand = rand()%MAX_OBSTACLE_TYPE;
-			int max = (idx < 8)?1:2;
-			while(obstacleSpawned[obstRand] > max)
+			
+			/*int max = (idx <= 7)?0:1;
+			while(obstacleSpawned[base] > max)
 			{
-				obstRand = rand()%MAX_OBSTACLE_TYPE;
-			}
+				inc = (inc+1)%4;
+				base = (base+inc)%MAX_OBSTACLE_TYPE;
+			}*/
 
-			obstacleSpawned[obstRand] += 1;
+			int obsType = 0;
+			if(sizeList > 0)
+			{
+				int rn = rand()%sizeList;
+				obsType = obstacleSpawned[rn];
+				int offset = 0;
+				for(int i = 0; i < sizeList;++i)
+				{
+					if(i == rn)
+					{
+						offset = -1;
+					}
+					else
+					{
+						obstacleSpawned[i+offset] = obstacleSpawned[i];
+					}
+				}
+
+				sizeList -= 1;
+			}
+			else
+				obsType = rand()%MAX_OBSTACLE_TYPE;
 
 			obj._machines[idx].usable = 1;
 			obj._machines[idx].frameUntilUsable = 0;
 
-			obj._machines[idx].obstacle = (ObstacleType)obstRand;
+			obj._machines[idx].obstacle = (ObstacleType)obsType;
 			obj._machines[idx].iconeSprite = upperSprite++;
 
 			const int offset[2] = {ANIM_WORK, ANIM_PUSH};
