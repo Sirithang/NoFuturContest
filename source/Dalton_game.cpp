@@ -13,6 +13,7 @@
 #define DALTON_TILE_SIZE (DALTON_TILE_COUNT*32)
 
 Dalton Dalton::dalton;
+mm_sfxhand sfxhandle_matrioshka;
 
 void Dalton::init()
 {
@@ -69,9 +70,11 @@ void Dalton::update()
 			{
 				(oamMain.oamMemory + DALTON_SPRITE + positions[counter])->palette = 1;
 
-				++counter;
+				// play SFX with added pitch
+				sfxhandle_matrioshka = mmEffect( SFX_MATRIOSHKA );
+				mmEffectRate( sfxhandle_matrioshka, 1024 + counter * 128);
 
-				mmEffect( SFX_TOUCH );
+				++counter;
 
 				if (counter > 3)
 				{

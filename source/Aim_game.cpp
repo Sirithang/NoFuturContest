@@ -3,6 +3,10 @@
 #include "../assets/soviet.h"
 #include "../assets/bar.h"
 
+#include <maxmod9.h>    // Maxmod definitions for ARM9
+#include "../assets/soundbank.h"
+#include "../assets/soundbank_bin.h"  // Soundbank definitions
+
 #define CAPITALIST_TILE (BAR_TILE + BAR_TILE_COUNT*5)
 #define CAPITALIST_TILE_COUNT (8*8)
 #define CAPITALIST_TILE_SIZE (CAPITALIST_TILE_COUNT*32)
@@ -92,6 +96,7 @@ void Aim::update()
 			if (	touch.px > capitalist->x && touch.px < capitalist->x + 64 &&
 				touch.py > capitalist->y && touch.py < capitalist->y + 64)
 			{
+				mmEffect( SFX_YEEHAW );
 				game_end(true);
 			}
 		}

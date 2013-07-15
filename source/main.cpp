@@ -39,6 +39,12 @@ int main()
 	mmLoadEffect( SFX_STEP_LEFT );
 	mmLoadEffect( SFX_STEP_RIGHT );
 	mmLoadEffect( SFX_TOUCH );
+	mmLoadEffect( SFX_PUNCH );
+	mmLoadEffect( SFX_OWWW );
+	mmLoadEffect( SFX_MATRIOSHKA );
+	mmLoadEffect( SFX_STATUE_BREAK );
+	mmLoadEffect( SFX_STATUE_HIT );
+	mmLoadEffect( SFX_YEEHAW );
 
 	// JINGLES
 	mmLoad( MOD_JINGLE_WIN );

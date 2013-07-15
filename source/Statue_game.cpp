@@ -13,6 +13,7 @@
 #define STATUE_TILE_SIZE (STATUE_TILE_COUNT*32)
 
 Statue Statue::statue;
+mm_sfxhand sfxhandle_statue_hit;
 
 void Statue::init()
 {
@@ -31,7 +32,7 @@ void Statue::init()
 
 	Game::init();
 
-	writeTimed("\x1b[10;10HFrappe!", 1000);
+	writeTimed("\x1b[10;10HDétruis!", 1000);
 }
 
 void Statue::update()
@@ -52,9 +53,14 @@ void Statue::update()
 				touch.py > statue->y && touch.py < statue->y + 64)
 			{
 				++counter;
-				mmEffect( SFX_TOUCH );
+
+				// play hit sfx with random pitch
+				sfxhandle_statue_hit = mmEffect( SFX_STATUE_HIT );
+				mmEffectRate( sfxhandle_statue_hit, 1024 + (rand() % 256 - 128) );
+
 				if (counter >= 3)
 				{
+					mmEffect( SFX_STATUE_BREAK );
 					game_end(true);
 				}
 			}

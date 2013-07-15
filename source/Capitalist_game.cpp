@@ -13,6 +13,7 @@
 #define SOVIET_TILE_SIZE (SOVIET_TILE_COUNT*32)
 
 Capitalist Capitalist::capitalist;
+mm_sfxhand sfxhandle_punch;
 
 void Capitalist::init()
 {
@@ -35,7 +36,7 @@ void Capitalist::init()
 
 	Game::init();
 
-	writeTimed("\x1b[10;10HFrappe!", 1000);
+	writeTimed("\x1b[10;10HTabasse!", 1000);
 }
 
 void Capitalist::update()
@@ -55,10 +56,15 @@ void Capitalist::update()
 			if (	touch.px > soviet->x && touch.px < soviet->x + 64 &&
 				touch.py > soviet->y && touch.py < soviet->y + 64)
 			{
+				// play punch sfx with random pitch
+				sfxhandle_punch = mmEffect( SFX_PUNCH );
+				mmEffectRate( sfxhandle_punch, 1024 + (rand() % 256 - 128) );
+
 				++counter;
-				mmEffect( SFX_TOUCH );
+
 				if (counter >= 3)
 				{
+					mmEffect( SFX_OWWW );
 					game_end(true);
 				}
 			}
