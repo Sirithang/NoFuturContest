@@ -98,6 +98,9 @@ void Aim::update()
 			{
 				mmEffect( SFX_YEEHAW );
 				game_end(true);
+				capitalist->gfxIndex = SOVIET_TILE + anim[capitalist_sprite]*SOVIET_TILE_COUNT;
+				capitalist->palette = 1;
+				capitalist_sprite = -1;
 			}
 		}
 	}

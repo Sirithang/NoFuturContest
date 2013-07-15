@@ -217,6 +217,12 @@ int main()
 			mmStart( MOD_SENOR_ZORRO_TITLE, MM_PLAY_LOOP );
 		}
 
+		// force to stay at least a second
+		for (int i = 0; i < 60; ++i)
+		{
+			swiWaitForVBlank();
+		}
+
 		// score screen loop
 		do
 		{
