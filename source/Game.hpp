@@ -17,6 +17,7 @@ class Game
 		virtual void init();
 		virtual void update();
 		virtual void draw() = 0;
+		virtual void cleanup() {}
 		
 		static void start_game(int game);
 		static void game_end(bool success);
