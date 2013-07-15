@@ -45,13 +45,21 @@ int main()
 	mmLoad( MOD_JINGLE_LOSE );
 
 	// MUSIC
+	mmLoad( MOD_SENOR_ZORRO_TITLE );
 	mmLoad( MOD_SENOR_ZORRO_ZA_RABOTU );
-	mmSetModuleVolume(512);	// = 1/2
-	mmSetModuleTempo(820);	// =~ 74.5 bpm
-	mmStart( MOD_SENOR_ZORRO_ZA_RABOTU, MM_PLAY_LOOP );
+	mmLoad( MOD_SENOR_ZORRO_LA_PLAYA );
+
+	mmSetModuleVolume(1024);
+	mmSetModuleTempo(1024);	
+	mmStart( MOD_SENOR_ZORRO_TITLE, MM_PLAY_LOOP );
 	
 	while (true)
 	{
+		// start title music
+		mmSetModuleVolume(1024);
+		mmSetModuleTempo(1024);	
+		mmStart( MOD_SENOR_ZORRO_TITLE, MM_PLAY_LOOP );
+
 		// setup title screen
 		int bg1 = bgInitSub(3, BgType_Text8bpp, BgSize_T_256x256, 0, 1);
 		dmaCopy(titreTiles, bgGetGfxPtr(bg1), sizeof(titreTiles));
@@ -106,6 +114,11 @@ int main()
 		REG_BLDCNT = 0;
 
 		srand(time);
+
+		// start main music
+		mmSetModuleVolume(768);	// = 1/2
+		mmSetModuleTempo(820);	// =~ 74.5 bpm
+		mmStart( MOD_SENOR_ZORRO_ZA_RABOTU, MM_PLAY_LOOP );
 
 		// initialize the hub, set it at the current screen
 		GameHub::hub.GameHub::init();
@@ -174,6 +187,11 @@ int main()
 			dmaCopy(winTiles, bgGetGfxPtr(bg2), sizeof(winTiles));
 			dmaCopy(winMap, bgGetMapPtr(bg2), sizeof(winMap));
 			dmaCopy(winPal, BG_PALETTE, sizeof(winPal));
+
+			// win screen music
+			mmSetModuleVolume(1024);
+			mmSetModuleTempo(1024);	
+			mmStart( MOD_SENOR_ZORRO_LA_PLAYA, MM_PLAY_LOOP );
 		}
 		else
 		{
@@ -186,6 +204,11 @@ int main()
 			dmaCopy(loseTiles, bgGetGfxPtr(bg2), sizeof(loseTiles));
 			dmaCopy(loseMap, bgGetMapPtr(bg2), sizeof(loseMap));
 			dmaCopy(losePal, BG_PALETTE, sizeof(losePal));
+
+			// lose screen music
+			mmSetModuleVolume(1024);
+			mmSetModuleTempo(1024);	
+			mmStart( MOD_SENOR_ZORRO_TITLE, MM_PLAY_LOOP );
 		}
 
 		// score screen loop
