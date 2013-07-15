@@ -77,6 +77,8 @@ void Aim::init()
 	Game::init();
 
 	writeTimed("\x1b[5;15HCamoufle le capitaliste!", 1000);
+
+	bgHide(1);
 }
 
 void Aim::update()

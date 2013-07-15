@@ -128,6 +128,7 @@ void GameHub::init()
 	// set as current
 	Game::current = this;
 
+	till_next_obstacle_move = 1;
 	nextBgScroll = 0;
 }
 
@@ -183,12 +184,13 @@ void GameHub::draw()
 void GameHub::update_top()
 {
 	++actual_frame;
+	till_next_obstacle_move-=1;
 
 	for (int i = 0; i < NUM_OBSTACLE; ++i)
 	{
 		if (obstacles[i].active)
 		{
-			if(anim != FALL)
+			if(till_next_obstacle_move == 0)
 			{
 				obstacles[i].position -= speed;
 			}
@@ -222,64 +224,72 @@ void GameHub::update_top()
 		}
 	}
 
-	if(anim != FALL)
-	{
-		--next_obstacle_frame;
-		if (next_obstacle_frame <= 0)
+	//if(anim != FALL)
+	//{
+		
+		if(till_next_obstacle_move == 0)
 		{
-			const int nbObstaclePerLevel[7] = {0, 4, 0, 6, 0, 9, 0};
-			const int speed_lev[7] = {1, 1, 2, 2, 2, 2, 2};
-			const int tempo_lev[7] = {820, 820, 992, 922, 1024, 1024, 1024};
-			const int nbFrames[7]= {60*5, 150, 5*60, 100, 5*60, 80, 5*60};
+			if(anim == FALL)
+				till_next_obstacle_move = 3;
+			else
+				till_next_obstacle_move = 1;
 
-			current_level_obstacle_count++;
-
-			if(current_level_obstacle_count >= nbObstaclePerLevel[current_level])
+			--next_obstacle_frame;
+			if (next_obstacle_frame <= 0)
 			{
-				if(current_level < 6)
-				{
-					current_level++;
-					current_level_obstacle_count = 0;
-					speed = speed_lev[current_level];
+				const int nbObstaclePerLevel[7] = {0, 4, 0, 6, 0, 9, 0};
+				const int speed_lev[7] = {1, 1, 2, 2, 2, 2, 2};
+				const int tempo_lev[7] = {820, 820, 992, 922, 1024, 1024, 1024};
+				const int nbFrames[7]= {60*5, 150, 5*60, 100, 5*60, 80, 5*60};
 
-					if(nbObstaclePerLevel[current_level] != 0)
-					{
-						mmSetModuleTempo( tempo_lev[current_level] );
-						mmPosition( 0 );
-					}
+				current_level_obstacle_count++;
 
-					next_obstacle_frame = nbFrames[current_level];
-				}
-				else
+				if(current_level_obstacle_count >= nbObstaclePerLevel[current_level])
 				{
-					if(player_life >= 6)
+					if(current_level < 6)
 					{
-						state = WIN;
+						current_level++;
+						current_level_obstacle_count = 0;
+						speed = speed_lev[current_level];
+
+						if(nbObstaclePerLevel[current_level] != 0)
+						{
+							mmSetModuleTempo( tempo_lev[current_level] );
+							mmPosition( 0 );
+						}
+
+						next_obstacle_frame = nbFrames[current_level];
 					}
 					else
 					{
-						state = LOSE;
+						if(player_life >= 6)
+						{
+							state = WIN;
+						}
+						else
+						{
+							state = LOSE;
+						}
 					}
+				}
+
+				if( nbObstaclePerLevel[current_level] != 0)
+				{
+					new_obstacle();
+					next_obstacle_frame = nbFrames[current_level];
 				}
 			}
 
-			if( nbObstaclePerLevel[current_level] != 0)
+			if(nextBgScroll == 0)
 			{
-				new_obstacle();
-				next_obstacle_frame = nbFrames[current_level];
+				bgScroll(bg, +speed, 0);
+				nextBgScroll = 2;
 			}
-		}
-
-		if(nextBgScroll == 0)
-		{
-			bgScroll(bg, +speed, 0);
-			nextBgScroll = 30;
-		}
 		
-		nextBgScroll--;
+			nextBgScroll--;
 
-		bgUpdate();
-	}
+			bgUpdate();
+		}
 
 	
 	for (int i = 0; i < NUM_OBSTACLE; ++i)

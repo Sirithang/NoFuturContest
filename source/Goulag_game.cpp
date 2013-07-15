@@ -132,7 +132,7 @@ void Goulag::update()
 				tmp = a;\
 				a = b;\
 				b = tmp;
-			if (select_y < touch.py)
+			/*if (select_y < touch.py)
 			{
 				for (int i = selected_capitalist - 1; i >= 0; --i)
 				{
@@ -167,7 +167,7 @@ void Goulag::update()
 						capitalist = oamMain.oamMemory + CAPITALIST_SPRITE + selected_capitalist;
 					}
 				}
-			}
+			}*/
 
 			select_x = touch.px;
 			select_y = touch.py;

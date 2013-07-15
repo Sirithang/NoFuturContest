@@ -53,6 +53,7 @@ void Dalton::init()
 	writeTimed("\x1b[11;6HDu plus petit\nau plus grand !", 1000);
 
 	bgHide(1);
+	bgHide(2);
 }
 
 void Dalton::update()
